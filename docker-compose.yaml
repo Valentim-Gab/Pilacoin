@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  pilacoin-wallet:
+    build: ./pilacoin-wallet
+    container_name: pilacoin-wallet
+    ports:
+      - '3044:3000'
