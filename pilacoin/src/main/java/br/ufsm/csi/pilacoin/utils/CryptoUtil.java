@@ -1,6 +1,6 @@
 package br.ufsm.csi.pilacoin.utils;
 
-import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
@@ -21,9 +21,18 @@ public class CryptoUtil {
     public CryptoUtil() throws NoSuchAlgorithmException {
     }
 
-    public BigInteger generatehash(PilaCoinJson pilaCoinJson) throws NoSuchAlgorithmException, JsonProcessingException {
+    public BigInteger generatehash(Object object) throws NoSuchAlgorithmException, JsonProcessingException {
+        String json = null;
+
+        if (object instanceof String) {
+            json = (String) object;
+        } else {
+            this.om = new ObjectMapper();
+            this.om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            json = this.om.writeValueAsString(object);
+        }
+
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        String json = om.writeValueAsString(pilaCoinJson);
         BigInteger hash = new BigInteger(md.digest(json.getBytes(StandardCharsets.UTF_8)));
 
         return hash.abs();

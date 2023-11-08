@@ -21,53 +21,53 @@
 // import com.fasterxml.jackson.core.JsonProcessingException;
 // import com.fasterxml.jackson.databind.ObjectMapper;
 
+// import br.ufsm.csi.pilacoin.model.json.BlockJson;
 // import br.ufsm.csi.pilacoin.model.json.DifficultJson;
-// import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
-// import br.ufsm.csi.pilacoin.model.json.ValidationPilaCoinJson;
+// import br.ufsm.csi.pilacoin.model.json.ValidationBlockJson;
 // import br.ufsm.csi.pilacoin.utils.CryptoUtil;
 
 // @Service
-// public class ValidationService {
-//     @Value("${queue.pilacoin.minerado}")
-//     private String pilaMineradoQueue;
+// public class ValidationBlockService {
+//     @Value("${queue.bloco.mined}")
+//     private String blockMinedQueue;
 
-//     @Value("${queue.pilacoin.validado}")
-//     private String pilaValidedQueue;
+//     @Value("${queue.bloco.valided}")
+//     private String blockValidedQueue;
 
 //     private DifficultService difficultService;
 //     private RabbitTemplate rabbitTemplate;
 //     private CryptoUtil cryptoUtil;
 
-//     public ValidationService(RabbitTemplate rabbitTemplate, DifficultService difficultService, CryptoUtil cryptoUtil) {
+//     public ValidationBlockService(RabbitTemplate rabbitTemplate, DifficultService difficultService, CryptoUtil cryptoUtil) {
 //         this.rabbitTemplate = rabbitTemplate;
 //         this.difficultService = difficultService;
 //         this.cryptoUtil = cryptoUtil;
 //     }
 
-//     @RabbitListener(queues = {"${queue.pilacoin.minerado}"})
+//     @RabbitListener(queues = {"${queue.bloco.mined}"})
 //     public void verifyMinedPila(@Payload String strJson) {
 //         try {
 //             ObjectMapper om = new ObjectMapper();
-//             PilaCoinJson pilaCoin = null;
-//             pilaCoin = om.readValue(strJson, PilaCoinJson.class);
+//             BlockJson block = null;
+//             block = om.readValue(strJson, BlockJson.class);
 
             
-//             if (pilaCoin.getNomeCriador().contains("Gabriel Valentim")) {
-//                 rabbitTemplate.convertAndSend(pilaMineradoQueue, strJson);
+//             if (block.getNomeUsuarioMinerador().contains("Gabriel Valentim")) {
+//                 rabbitTemplate.convertAndSend(blockMinedQueue, strJson);
 
 //                 return;
 //             }
 
-//             System.out.println("[VERIFICANDO]: " + pilaCoin.toString());
+//             System.out.println("[VERIFICANDO]: " + block.toString());
 
 //             while (difficultService.difficultJson == null) {
-//                 //System.out.println("[WAITING]: Dificuldade");
+//                 Thread.sleep(1000);
 //             }
 
 //             DifficultJson difficultJson = difficultService.difficultJson;
             
 //             BigInteger difficult = new BigInteger(difficultJson.getDificuldade(), 16).abs();
-//             BigInteger hash = cryptoUtil.generatehash(pilaCoin).abs();
+//             BigInteger hash = cryptoUtil.generatehash(block).abs();
 
 //             if (hash.compareTo(difficult) < 0) {
 //                 Cipher cipher = Cipher.getInstance("RSA");
@@ -78,17 +78,17 @@
 
 //                 System.out.println("[SIGNATURE]: " + Base64.getEncoder().encodeToString(signature));
 
-//                 ValidationPilaCoinJson vPilaCoin = ValidationPilaCoinJson.builder()
-//                         .pilaCoin(pilaCoin)
-//                         .assinaturaPilaCoin(signature)
+//                 ValidationBlockJson vBlock = ValidationBlockJson.builder()
+//                         .bloco(block)
+//                         .assinaturaBloco(signature)
 //                         .chavePublicaValidador(cryptoUtil.pair.getPublic().getEncoded())
 //                         .nomeValidador("Gabriel Valentim").build();
 
-//                 rabbitTemplate.convertAndSend(pilaValidedQueue, om.writeValueAsString(vPilaCoin));
+//                 rabbitTemplate.convertAndSend(blockValidedQueue, om.writeValueAsString(vBlock));
 //             } else {
-//                 System.out.println("[INVALID]: " + pilaCoin.getNonce());
+//                 System.out.println("[INVALID]: " + block.getNonce());
 //             }
-//         } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException  | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException e) {
+//         } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException  | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | InterruptedException e) {
 //             e.printStackTrace();
 //         }
 //     }

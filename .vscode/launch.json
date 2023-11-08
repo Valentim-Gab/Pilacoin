@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-PilacoinApplication<pilacoin>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "br.ufsm.csi.pilacoin.PilacoinApplication",
+      "projectName": "pilacoin",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

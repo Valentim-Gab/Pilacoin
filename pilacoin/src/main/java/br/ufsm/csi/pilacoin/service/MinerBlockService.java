@@ -16,9 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.ufsm.csi.pilacoin.model.json.BlockJson;
 import br.ufsm.csi.pilacoin.model.json.DifficultJson;
-import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
-import jakarta.annotation.PostConstruct;
 
 @Service
 public class MinerBlockService {
@@ -55,27 +53,29 @@ public class MinerBlockService {
                         System.out.println(dificuldade);
                         System.out.println(block.toString());
 
-                        // PilaCoinJson pilaJson = PilaCoinJson.builder()
-                        //         .nomeCriador("Gabriel Valentim")
-                        //         .dataCriacao(new Date())
-                        //         .chaveCriador(cryptoUtil.pair.getPublic().getEncoded()).build();
+                        BlockJson minedBlock = BlockJson.builder() 
+                                .numeroBloco(block.getNumeroBloco())
+                                .nonceBlocoAnterior(block.getNonce())
+                                .chaveUsuarioMinerador(cryptoUtil.pair.getPublic().getEncoded())
+                                .nomeUsuarioMinerador("Gabriel Valentim")
+                                .build();
 
-                        // byte[] bNum = new byte[256/8];
-                        // Random random = new Random(System.currentTimeMillis());
+                        byte[] bNum = new byte[256/8];
+                        Random random = new Random(System.currentTimeMillis());
 
-                        // do {
-                        //     random.nextBytes(bNum);
-                        //     pilaJson.setNonce(new BigInteger(bNum).abs().toString());
-                        // } while (cryptoUtil.generatehash(pilaJson).compareTo(dificuldade) > 0);
+                        do {
+                            random.nextBytes(bNum);
+                            minedBlock.setNonce(new BigInteger(bNum).abs().toString());
+                        } while (cryptoUtil.generatehash(minedBlock).compareTo(dificuldade) > 0);
 
-                        // if (difficultJson.getValidadeFinal().compareTo(new Date()) > 0 || true) {
-                        //     ObjectMapper mapper = new ObjectMapper();
-                        //     String pilaStr = mapper.writeValueAsString(pilaJson);
+                        if (difficultJson.getValidadeFinal().compareTo(new Date()) > 0 || true) {
+                            ObjectMapper mapper = new ObjectMapper();
+                            String blockStr = mapper.writeValueAsString(minedBlock);
 
-                        //     rabbitTemplate.convertAndSend(pilaMineradoQueue, pilaStr);
-                        // }
+                            // rabbitTemplate.convertAndSend(blockMinedQueue, blockStr);
+                        }
                     }
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | JsonProcessingException | NoSuchAlgorithmException e) {
                     throw new RuntimeException(e);
                 }
             }
