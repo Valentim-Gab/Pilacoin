@@ -37,6 +37,3 @@ Run the PilacoinApplication.java class with Spring
 npx pnpm run dev
 
 ```
-
-
-pnpm add -g pnpm
