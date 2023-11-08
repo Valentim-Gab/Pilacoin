@@ -1,0 +1,43 @@
+.navbar {
+  background-color: var(--black-111);
+  transform: scaleY(0);
+  transform-origin: top;
+  position: fixed;
+  transition: 0.4s;
+  opacity: 0;
+  top: 48px;
+
+  @media (min-width: 1024px) {
+    background-color: transparent;
+    transform: scaleY(1);
+    opacity: 1;
+    top: 0;
+    position: relative;
+  }
+
+  &.active {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+
+  .items {
+    li {
+      .item {
+        transition: 0.4s;
+
+        &.activated {
+          color: var(--gold);
+        }
+      }
+
+      &:hover > .item {
+        transform: translateX(1rem);
+
+        @media (min-width: 1024px) {
+          transform: translateX(0);
+          scale: 1.2;
+        }
+      }
+    }
+  }
+}

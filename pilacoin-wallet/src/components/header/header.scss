@@ -1,0 +1,16 @@
+header {
+  background-color: var(--black-111);
+
+  .logo {
+    color: var(--gold);
+    align-self: stretch;
+  }
+
+  .burger-icon {
+    transition: 0.2s;
+
+    &:hover {
+      color: var(--gold);
+    }
+  }
+}
