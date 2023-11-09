@@ -1,4 +1,4 @@
-@import '@/assets/styles/media-queries.scss';
+@import "@/assets/styles/media-queries.scss";
 
 .navbar {
   transform: scaleY(0);
@@ -7,8 +7,8 @@
   transition: 0.4s;
   opacity: 0;
   top: 48px;
-  
-  @media (min-width: $lg) {
+
+  @media (min-width: $sm) {
     transform: scaleY(1);
     opacity: 1;
     top: 0;
@@ -29,7 +29,7 @@
       &:hover > .item {
         transform: translateX(1rem);
 
-        @media (min-width: $lg) {
+        @media (min-width: $sm) {
           transform: translateX(0);
           scale: 1.2;
         }

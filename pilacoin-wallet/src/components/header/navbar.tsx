@@ -28,8 +28,12 @@ export default function Navbar({ active, setActive, pathname }: NavbarProps) {
   ]
 
   return (
-    <nav className={`navbar bg-primary w-full ${active ? 'active' : ''} lg:w-fit lg:bg-transparent`}>
-      <ul className="items border-t lg:flex lg:border-none lg:px-4 lg:gap-4">
+    <nav
+      className={`navbar bg-primary w-full ${
+        active ? 'active' : ''
+      } sm:w-fit sm:bg-transparent`}
+    >
+      <ul className="items border-t sm:flex sm:border-none sm:px-4 sm:gap-4">
         {items &&
           items.map((item, index) => (
             <Link
@@ -45,8 +49,8 @@ export default function Navbar({ active, setActive, pathname }: NavbarProps) {
                     pathname === item.url ? 'text-gold' : ''
                   }`}
                 >
-                  <i className={`${item.icon} lg:text-2xl`}></i>
-                  <p>{item.text}</p>
+                  <i className={`${item.icon} sm:text-2xl`}></i>
+                  <p className="sm:text-sm">{item.text}</p>
                 </div>
               </li>
             </Link>

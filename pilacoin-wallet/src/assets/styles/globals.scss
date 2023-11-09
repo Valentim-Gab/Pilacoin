@@ -66,6 +66,10 @@
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
   }
+
+  .text-xs2 {
+    font-size: 10px;
+  }
 }
 
 @layer base {
@@ -76,8 +80,12 @@
   body {
     @apply bg-background text-foreground dark text-xs;
 
-    @media (min-width: $lg) {
+    @media (min-width: $sm) {
       @apply text-base;
+    }
+
+    @media (min-width: $lg) {
+      @apply text-lg;
     }
   }
 }
