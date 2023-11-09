@@ -10,9 +10,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DifficultService {
-    @Value("${queue.msgs}")
-    private String queue_msgs;
-
     @Value("${queue.errors}")
     private String queue_errors;
 

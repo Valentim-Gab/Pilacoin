@@ -8,6 +8,17 @@
       "mainClass": "br.ufsm.csi.pilacoin.PilacoinApplication",
       "projectName": "pilacoin",
       "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=65424 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=pilacoin"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-PilaCoin<pilacoin>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "br.ufsm.csi.pilacoin.model.PilaCoin",
+      "projectName": "pilacoin",
+      "args": "",
       "envFile": "${workspaceFolder}/.env"
     }
   ]

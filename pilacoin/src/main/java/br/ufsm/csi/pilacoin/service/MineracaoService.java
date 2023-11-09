@@ -63,6 +63,8 @@
 //                             ObjectMapper mapper = new ObjectMapper();
 //                             String pilaStr = mapper.writeValueAsString(pilaJson);
 
+//                             System.out.println("Pila minerado: " + pilaStr);
+
 //                             rabbitTemplate.convertAndSend(pilaMineradoQueue, pilaStr);
 //                         }
 //                     }
