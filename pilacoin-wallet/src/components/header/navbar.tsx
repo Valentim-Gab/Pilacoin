@@ -29,7 +29,7 @@ export default function Navbar({ active, setActive, pathname }: NavbarProps) {
 
   return (
     <nav className={`navbar w-full ${active ? 'active' : ''} lg:w-fit`}>
-      <ul className="items border-t lg:flex lg:border-none">
+      <ul className="items border-t lg:flex lg:border-none lg:px-4 lg:gap-4">
         {items &&
           items.map((item, index) => (
             <Link
@@ -45,7 +45,7 @@ export default function Navbar({ active, setActive, pathname }: NavbarProps) {
                     pathname === item.url ? 'activated' : ''
                   }`}
                 >
-                  <i className={item.icon}></i>
+                  <i className={`${item.icon} lg:text-2xl`}></i>
                   <p>{item.text}</p>
                 </div>
               </li>

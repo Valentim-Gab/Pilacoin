@@ -1,3 +1,5 @@
+@import '@/assets/styles/media-queries.scss';
+
 .navbar {
   background-color: var(--black-111);
   transform: scaleY(0);
@@ -7,7 +9,7 @@
   opacity: 0;
   top: 48px;
 
-  @media (min-width: 1024px) {
+  @media (min-width: $lg) {
     background-color: transparent;
     transform: scaleY(1);
     opacity: 1;
@@ -33,7 +35,7 @@
       &:hover > .item {
         transform: translateX(1rem);
 
-        @media (min-width: 1024px) {
+        @media (min-width: $lg) {
           transform: translateX(0);
           scale: 1.2;
         }

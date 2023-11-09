@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import 'media-queries.scss';
 
 :root {
   --black-111: #111;
@@ -78,5 +79,9 @@
   }
   body {
     @apply bg-background text-foreground dark text-xs;
+
+    @media (min-width: $lg) {
+      @apply text-base;
+    }
   }
 }
