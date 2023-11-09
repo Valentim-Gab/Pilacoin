@@ -1,16 +1,14 @@
 @import '@/assets/styles/media-queries.scss';
 
 .navbar {
-  background-color: var(--black-111);
   transform: scaleY(0);
   transform-origin: top;
   position: fixed;
   transition: 0.4s;
   opacity: 0;
   top: 48px;
-
+  
   @media (min-width: $lg) {
-    background-color: transparent;
     transform: scaleY(1);
     opacity: 1;
     top: 0;
@@ -26,10 +24,6 @@
     li {
       .item {
         transition: 0.4s;
-
-        &.activated {
-          color: var(--gold);
-        }
       }
 
       &:hover > .item {

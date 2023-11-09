@@ -28,7 +28,7 @@ export default function Navbar({ active, setActive, pathname }: NavbarProps) {
   ]
 
   return (
-    <nav className={`navbar w-full ${active ? 'active' : ''} lg:w-fit`}>
+    <nav className={`navbar bg-primary w-full ${active ? 'active' : ''} lg:w-fit lg:bg-transparent`}>
       <ul className="items border-t lg:flex lg:border-none lg:px-4 lg:gap-4">
         {items &&
           items.map((item, index) => (
@@ -42,7 +42,7 @@ export default function Navbar({ active, setActive, pathname }: NavbarProps) {
               <li className="flex items-center self-stretch p-4 cursor-pointer">
                 <div
                   className={`item flex items-center gap-2 ${
-                    pathname === item.url ? 'activated' : ''
+                    pathname === item.url ? 'text-gold' : ''
                   }`}
                 >
                   <i className={`${item.icon} lg:text-2xl`}></i>

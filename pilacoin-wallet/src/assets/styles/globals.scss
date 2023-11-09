@@ -1,12 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import 'media-queries.scss';
-
-:root {
-  --black-111: #111;
-  --gold: #F3BA2F;
-}
+@import "media-queries.scss";
+@import "colors.scss";
 
 @layer base {
   :root {
@@ -75,8 +71,8 @@
 @layer base {
   * {
     @apply border-border;
-    
   }
+
   body {
     @apply bg-background text-foreground dark text-xs;
 
