@@ -5,6 +5,10 @@ $black-primary: #111;
   .gold {
     color: $gold-color;
   }
+
+  .background-gold {
+    background-color: $gold-color;
+  }
   
   .bg-black-primary {
     background-color: $black-primary;
@@ -13,6 +17,10 @@ $black-primary: #111;
 
 .text-gold {
   @apply gold
+}
+
+.bg-gold {
+  @apply background-gold
 }
 
 .bg-primary {
