@@ -73,7 +73,7 @@
 //                 Cipher cipher = Cipher.getInstance("RSA");
 //                 cipher.init(Cipher.ENCRYPT_MODE, cryptoUtil.pair.getPrivate());
 
-//                 MessageDigest md = MessageDigest.getInstance("sha-256");
+//                 MessageDigest md = MessageDigest.getInstance("SHA-256");
 //                 byte[] signature = cipher.doFinal(md.digest(strJson.getBytes(StandardCharsets.UTF_8)));
 
 //                 System.out.println("[SIGNATURE]: " + Base64.getEncoder().encodeToString(signature));

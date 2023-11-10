@@ -29,6 +29,7 @@ public class CryptoUtil {
         } else {
             this.om = new ObjectMapper();
             this.om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            
             json = this.om.writeValueAsString(object);
         }
 
