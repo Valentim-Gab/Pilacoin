@@ -1,0 +1,5 @@
+.form-input {
+  &:read-only:focus-visible {
+    box-shadow: none;
+  }
+}

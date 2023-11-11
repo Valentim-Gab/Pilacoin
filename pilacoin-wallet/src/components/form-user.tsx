@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,7 +14,9 @@ import {
 } from './ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from './ui/button'
-import { read } from 'fs'
+import './form-user.scss'
+import { UserService } from '@/services/user-service'
+import { User } from '@/interfaces/user'
 
 interface ValidationMessageInterface {
   fieldname: string
@@ -66,7 +68,7 @@ const formSchema = z.object({
   }),
 })
 
-export default function FormUser() {
+export default function FormUser({ user }: { user: User | undefined }) {
   const [readonly, setReadonly] = useState(true)
 
   const fields = [
@@ -90,24 +92,30 @@ export default function FormUser() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: '',
-      name: '',
-      email: '',
+      username: user?.username ?? '',
+      name: user?.name ?? '',
+      email: user?.email ?? '',
     },
   })
 
   function onCancel() {
     form.reset()
+
     setReadonly(true)
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+    console.info(values)
+
+    setReadonly(true)
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 w-full p-2"
+      >
         {fields &&
           fields.map((fieldItem, index) => (
             <FormField
@@ -116,13 +124,13 @@ export default function FormUser() {
               key={index}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-light">
-                    {fieldItem.label}
+                  <FormLabel className="text-xs font-light 2xl:text-sm">
+                    {fieldItem.label}:
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder={fieldItem.placeholder}
-                      className="text-xs read-only:border-none read-only:p-0 read-only:h-fit read-only:focus-visible:outline-none"
+                      className="form-input text-xs read-only:border-none read-only:p-0 read-only:h-fit sm:text-sm sm:p-4 sm:h-fit 2xl:text-base"
                       {...field}
                       readOnly={readonly}
                     />
@@ -139,9 +147,9 @@ export default function FormUser() {
               onClick={() => {
                 setReadonly(false)
               }}
-              className="flex py-1 px-2 justify-center items-center gap-1 h-fit bg-gold"
+              className="flex py-1 px-2 justify-center items-center gap-1 h-fit bg-gold sm:px-3 sm:text-base sm:font-bold 2xl:text-lg 2xl:py-2 2xl:px-4"
             >
-              <i className="icon-[solar--pen-2-bold] text-base"></i>
+              <i className="icon-[solar--pen-2-bold] text-base sm:text-2xl"></i>
               Editar
             </Button>
           ) : (
@@ -149,16 +157,16 @@ export default function FormUser() {
               <Button
                 type="button"
                 onClick={onCancel}
-                className="flex py-1 px-2 justify-center items-center gap-1 h-fit bg-gray-400"
+                className="flex py-1 px-2 justify-center items-center gap-1 h-fit bg-gray-400 sm:px-3 sm:text-base sm:font-bold 2xl:text-lg 2xl:py-2 2xl:px-4"
               >
-                <i className="icon-[solar--close-circle-outline] text-base"></i>
+                <i className="icon-[solar--close-circle-outline] text-base sm:text-2xl"></i>
                 Cancelar
               </Button>
               <Button
                 type="submit"
-                className="flex py-1 px-2 justify-center items-center gap-1 h-fit bg-gold"
+                className="flex py-1 px-2 justify-center items-center gap-1 h-fit bg-gold sm:px-3 sm:text-base sm:font-bold 2xl:text-lg 2xl:py-2 2xl:px-4"
               >
-                <i className="icon-[solar--verified-check-linear] text-base"></i>
+                <i className="icon-[solar--verified-check-linear] text-base sm:text-2xl"></i>
                 Enviar
               </Button>
             </div>

@@ -1,22 +1,11 @@
 import React from 'react'
 import Cryptocurrency from '@/components/cryptocurrency'
 import './home.scss'
+import { CoinService } from '@/services/coin-service'
 
-export default function Home() {
-  const coins = [
-    {
-      name: 'PilaCoin',
-      icon: 'icon-[solar--chat-round-money-bold] gold',
-      price: 144.2,
-      balance: 23.0,
-    },
-    {
-      name: 'Real Brasileiro',
-      image: '/images/icons/brl-icon.png',
-      price: 1.0,
-      balance: 0.0,
-    },
-  ]
+export default async function Home() {
+  const coinService: CoinService = new CoinService()
+  const coins = await coinService.getAllCoins()
 
   return (
     <main className="home flex min-h-screen flex-col items-center flex-1 self-stretch lg:py-8">
@@ -40,6 +29,7 @@ export default function Home() {
                   image={coin.image}
                   price={coin.price}
                   balance={coin.balance}
+                  iconClass={coin.icon ? 'text-gold' : ''}
                 />
               </li>
             ))}

@@ -1,7 +1,9 @@
+@import "@/assets/styles/media-queries.scss";
+
 .crypto-item {
-  .icon-[solar--chat-round-money-bold] {
-    color: var(--gold);
-    
+  .coin-icon {
+    @media (min-width: $xl2) {
+      font-size: 40px;
+    }
   }
 }
-

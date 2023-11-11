@@ -1,0 +1,13 @@
+@import "@/assets/styles/media-queries.scss";
+
+.account {
+  .section-form {
+    @media (min-width: $lg) {
+      max-width: 800px;
+    }
+
+    @media (min-width: $xl2) {
+      max-width: 1200px;
+    }
+  }
+}
