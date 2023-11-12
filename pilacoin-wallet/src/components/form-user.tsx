@@ -13,10 +13,10 @@ import {
   FormMessage,
 } from './ui/form'
 import { Input } from '@/components/ui/input'
-import { Button } from './ui/button'
 import './form-user.scss'
-import { UserService } from '@/services/user-service'
 import { User } from '@/interfaces/user'
+import FormBtn from './form-btn'
+import Alert from './alert'
 
 interface ValidationMessageInterface {
   fieldname: string
@@ -70,6 +70,7 @@ const formSchema = z.object({
 
 export default function FormUser({ user }: { user: User | undefined }) {
   const [readonly, setReadonly] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
 
   const fields = [
     {
@@ -108,6 +109,11 @@ export default function FormUser({ user }: { user: User | undefined }) {
     console.info(values)
 
     setReadonly(true)
+    setIsOpen(true)
+
+    setTimeout(() => {
+      setIsOpen(false)
+    }, 2000)
   }
 
   return (
@@ -142,37 +148,35 @@ export default function FormUser({ user }: { user: User | undefined }) {
           ))}
         <div className="flex flex-col items-end">
           {readonly ? (
-            <Button
+            <FormBtn
               type="button"
               onClick={() => {
                 setReadonly(false)
               }}
-              className="flex py-1 px-2 justify-center items-center gap-1 h-fit bg-gold sm:px-3 sm:text-base sm:font-bold 2xl:text-lg 2xl:py-2 2xl:px-4"
             >
               <i className="icon-[solar--pen-2-bold] text-base sm:text-2xl"></i>
               Editar
-            </Button>
+            </FormBtn>
           ) : (
             <div className="flex gap-2">
-              <Button
-                type="button"
-                onClick={onCancel}
-                className="flex py-1 px-2 justify-center items-center gap-1 h-fit bg-gray-400 sm:px-3 sm:text-base sm:font-bold 2xl:text-lg 2xl:py-2 2xl:px-4"
-              >
+              <FormBtn type="button" color="cancel" onClick={onCancel}>
                 <i className="icon-[solar--close-circle-outline] text-base sm:text-2xl"></i>
                 Cancelar
-              </Button>
-              <Button
-                type="submit"
-                className="flex py-1 px-2 justify-center items-center gap-1 h-fit bg-gold sm:px-3 sm:text-base sm:font-bold 2xl:text-lg 2xl:py-2 2xl:px-4"
-              >
+              </FormBtn>
+              <FormBtn type="submit">
                 <i className="icon-[solar--verified-check-linear] text-base sm:text-2xl"></i>
                 Enviar
-              </Button>
+              </FormBtn>
             </div>
           )}
         </div>
       </form>
+      <Alert
+        title="Sucesso!"
+        description="Usuário atualizado com sucesso."
+        open={isOpen}
+        setOpen={setIsOpen}
+      ></Alert>
     </Form>
   )
 }

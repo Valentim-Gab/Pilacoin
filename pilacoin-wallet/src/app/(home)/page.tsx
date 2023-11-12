@@ -29,7 +29,11 @@ export default async function Home() {
                   image={coin.image}
                   price={coin.price}
                   balance={coin.balance}
-                  iconClass={coin.icon ? 'text-gold' : ''}
+                  iconClass={
+                    coin.name.toLowerCase() == 'pilacoin'
+                      ? 'text-gold'
+                      : undefined
+                  }
                 />
               </li>
             ))}

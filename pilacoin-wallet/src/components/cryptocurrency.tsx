@@ -1,6 +1,7 @@
 import Image from 'next/image'
-import React from 'react'
+import React, { ElementType } from 'react'
 import './cryptocurrency.scss'
+import { twMerge } from 'tailwind-merge'
 
 interface CryptocurrencyProps {
   name: string
@@ -24,7 +25,10 @@ export default function Cryptocurrency({
       <div className="flex justify-center items-center gap-1 self-stretch px-2 sm:gap-2 2xl:gap-4">
         {icon && (
           <i
-            className={`coin-icon ${icon} ${iconClass} text-2xl sm:text-3xl`}
+            className={twMerge(
+              `${icon} coin-icon text-2xl sm:text-3xl`,
+              iconClass
+            )}
           ></i>
         )}
         {image && (
@@ -39,8 +43,18 @@ export default function Cryptocurrency({
         <h2>{name}</h2>
       </div>
       <div className="flex justify-between items-center self-stretch w-36 px-2 font-medium sm:w-60 2xl:w-80 2xl:text-xl">
-        <h3>{price}</h3>
-        <h3>{balance}</h3>
+        <h3>
+          {price.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          })}
+        </h3>
+        <h3>
+          {balance.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </h3>
       </div>
     </div>
   )
