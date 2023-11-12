@@ -4,7 +4,7 @@ import './home.scss'
 import { CoinService } from '@/services/coin-service'
 
 export default async function Home() {
-  const coinService: CoinService = new CoinService()
+  const coinService = new CoinService()
   const coins = await coinService.getAllCoins()
 
   return (

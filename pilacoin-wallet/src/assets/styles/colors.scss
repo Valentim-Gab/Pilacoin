@@ -1,4 +1,4 @@
-$gold-color: #F3BA2F;
+$gold-color: #f3ba2f;
 $black-primary: #111;
 
 @layer base {
@@ -9,20 +9,28 @@ $black-primary: #111;
   .background-gold {
     background-color: $gold-color;
   }
-  
+
+  .bd-gold {
+    border-color: $gold-color;
+  }
+
   .bg-black-primary {
     background-color: $black-primary;
   }
 }
 
 .text-gold {
-  @apply gold
+  @apply gold;
 }
 
 .bg-gold {
-  @apply background-gold
+  @apply background-gold;
+}
+
+.border-gold {
+  @apply bd-gold;
 }
 
 .bg-primary {
-  @apply bg-black-primary
+  @apply bg-black-primary;
 }

@@ -18,6 +18,7 @@ const button = tv({
 interface FormBtnProps extends VariantProps<typeof button> {
   type: 'button' | 'submit' | 'reset' | undefined
   children: ReactNode
+  disabled?: boolean
   onClick?: () => void
 }
 
@@ -26,9 +27,15 @@ export default function FormBtn({
   onClick,
   children,
   color,
+  disabled,
 }: FormBtnProps) {
   return (
-    <Button type={type} className={button({ color })} onClick={onClick}>
+    <Button
+      type={type}
+      className={button({ color })}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
     </Button>
   )

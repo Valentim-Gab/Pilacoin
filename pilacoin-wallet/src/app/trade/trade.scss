@@ -1,11 +1,7 @@
 @import "@/assets/styles/media-queries.scss";
 
 .trade {
-  .section-coins {
-    @media (min-width: $lg) {
-      max-width: 800px;
-    }
-
+  .section-trade {
     @media (min-width: $xl2) {
       max-width: 1200px;
     }
