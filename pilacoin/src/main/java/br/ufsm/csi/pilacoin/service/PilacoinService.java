@@ -14,14 +14,14 @@ public class PilacoinService {
     this.pRepository = pRepository;
   }
 
-  public PilaCoin save(PilaCoinJson pilaCoinJson) {
+  public PilaCoin save(PilaCoinJson pilaCoinJson, PilaCoin.StatusPila status) {
 
     PilaCoin pilaCoin = PilaCoin.builder()
         .chaveCriador(pilaCoinJson.getChaveCriador())
         .dataCriacao(pilaCoinJson.getDataCriacao())
         .nomeCriador(pilaCoinJson.getNomeCriador())
         .nonce(pilaCoinJson.getNonce())
-        .status(PilaCoin.StatusPila.VALIDO)
+        .status(status)
         .build();
 
     return pRepository.save(pilaCoin);
