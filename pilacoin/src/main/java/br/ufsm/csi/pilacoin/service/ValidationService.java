@@ -35,14 +35,20 @@ public class ValidationService {
     @Value("${queue.pilacoin.validado}")
     private String pilaValidedQueue;
 
+    @Value("${queue.pilacoin.valided.user}")
+    private String pilaValidedUserQueue;
+
     private DifficultService difficultService;
     private RabbitTemplate rabbitTemplate;
     private CryptoUtil cryptoUtil;
+    private PilacoinService pilacoinService;
 
-    public ValidationService(RabbitTemplate rabbitTemplate, DifficultService difficultService, CryptoUtil cryptoUtil) {
+    public ValidationService(RabbitTemplate rabbitTemplate, DifficultService difficultService, CryptoUtil cryptoUtil,
+            PilacoinService pilacoinService) {
         this.rabbitTemplate = rabbitTemplate;
         this.difficultService = difficultService;
         this.cryptoUtil = cryptoUtil;
+        this.pilacoinService = pilacoinService;
     }
 
     // @RabbitListener(queues = { "${queue.pilacoin.minerado}" })
@@ -103,18 +109,20 @@ public class ValidationService {
     @RabbitListener(queues = { "${queue.pilacoin.valided.user}" })
     public void receiveValidedPila(@Payload String strJson) {
         try {
-            System.out.println("\n\n[RECEBI]: " + strJson);
-
             ObjectMapper om = new ObjectMapper();
             ValidationPilaCoinJson vPilaCoin = null;
             vPilaCoin = om.readValue(strJson, ValidationPilaCoinJson.class);
-            String nomeCriador = vPilaCoin.getPilaCoin().getNomeCriador();
+            String nomeCriador = vPilaCoin.getPilaCoinJson().getNomeCriador();
 
             if (!nomeCriador.equals("Gabriel Valentim")) {
+                rabbitTemplate.convertAndSend(pilaValidedUserQueue, strJson);
+
                 return;
             }
 
-            System.out.println("\n\n[ARMAZENANDO]: " + strJson);
+            System.out.println("\n\n[ATUALIZANDO]: " + strJson);
+
+            pilacoinService.update(vPilaCoin.getPilaCoinJson(), PilaCoin.StatusPila.VALIDO);
         } catch (Exception e) {
             e.printStackTrace();
         }
