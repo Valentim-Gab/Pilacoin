@@ -1,17 +1,20 @@
 FROM ubuntu:latest as build
 
-RUN apt-get update
-RUN apt-get install openjdk-17-jdk -y
+RUN apt-get update && apt-get install openjdk-17-jdk -y
+
+WORKDIR /app
 
 COPY . .
 
 RUN apt-get install maven -y
-RUN mvn clean install
+RUN mvn clean install -DskipTests
 
 FROM openjdk:17-jdk-slim
 
-EXPOSE 8081
+WORKDIR /app
 
-COPY --from=build /target/pilacoin-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+
+COPY --from=build /app/target/pilacoin-0.0.1-SNAPSHOT.jar app.jar
 
 ENTRYPOINT [ "java", "-jar", "app.jar" ]
