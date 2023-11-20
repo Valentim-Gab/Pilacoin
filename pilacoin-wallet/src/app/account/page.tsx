@@ -4,7 +4,7 @@ import './account.scss'
 
 export default async function Account() {
   const userService = new UserService()
-  const user = await userService.getUser()
+  const user = await userService.getLoggedUser()
 
   return (
     <main className="account flex min-h-screen flex-col items-center flex-1 self-stretch lg:py-8">

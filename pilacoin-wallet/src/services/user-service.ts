@@ -1,9 +1,28 @@
 import { User } from '@/interfaces/user'
 
 export class UserService {
-  public async getUser(): Promise<User> {
+  private readonly apiUrl = process.env.API_URL
+  private readonly endpoint = `${this.apiUrl}/user`
+
+  public async findAll(): Promise<User[] | null> {
+    try {
+      const response = await fetch(this.endpoint)
+
+      if (response.ok && response.status == 200) {  
+        const data = await response.json()
+
+        return data
+      }
+    } catch (err) {
+      console.error(err)
+    }
+
+    return null
+  }
+
+  public async getLoggedUser(): Promise<User> {
     return {
-      name: 'Gabriel Valentim',
+      nome: 'Gabriel_Valentim',
       username: 'Valentim-Gab',
       email: 'gabriel@gmail.com',
     }
