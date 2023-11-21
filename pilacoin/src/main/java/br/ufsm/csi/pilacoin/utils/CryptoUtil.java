@@ -14,28 +14,38 @@ import java.security.NoSuchAlgorithmException;
 
 @Component
 public class CryptoUtil {
-    public KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-    public KeyPair pair = generator.generateKeyPair();
     private ObjectMapper om = new ObjectMapper();
 
-    public CryptoUtil() throws NoSuchAlgorithmException {
-    }
+    public BigInteger generatehash(Object object) {
+        try {
+            String json = null;
 
-    public BigInteger generatehash(Object object) throws NoSuchAlgorithmException, JsonProcessingException {
-        String json = null;
+            if (object instanceof String) {
+                json = (String) object;
+            } else {
+                this.om = new ObjectMapper();
+                this.om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-        if (object instanceof String) {
-            json = (String) object;
-        } else {
-            this.om = new ObjectMapper();
-            this.om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            
-            json = this.om.writeValueAsString(object);
+                json = this.om.writeValueAsString(object);
+            }
+
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            BigInteger hash = new BigInteger(md.digest(json.getBytes(StandardCharsets.UTF_8)));
+
+            return hash.abs();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
 
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        BigInteger hash = new BigInteger(md.digest(json.getBytes(StandardCharsets.UTF_8)));
+        return null;
+    }
 
-        return hash.abs();
+    public void generateKeys() {
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            KeyPair pair = generator.generateKeyPair();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 }
