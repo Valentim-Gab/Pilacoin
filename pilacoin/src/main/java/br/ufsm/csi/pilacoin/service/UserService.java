@@ -5,15 +5,15 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.el.stream.Optional;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import br.ufsm.csi.pilacoin.model.PilaCoin;
 import br.ufsm.csi.pilacoin.model.User;
 
 @Service
@@ -45,6 +45,15 @@ public class UserService {
       }
     } catch (JsonProcessingException e) {
       return new ResponseEntity<>("Erro no servidor", HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @RabbitListener(queues = { "${queue.users}" })
+  public void getMessagesUser(@Payload String message) {
+    try {
+      System.out.println(message);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }

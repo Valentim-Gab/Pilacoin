@@ -10,30 +10,30 @@
 
 // @Service
 // public class MessagesService {
-//     @RabbitListener(queues = {"${queue.user}"})
-//     public void getMessagesUser(@Payload String message) {
-//         try {
-//             System.out.println(message);
-//         } catch (Exception e) {
-//             throw new RuntimeException(e);
-//         }
-//     }
+// @RabbitListener(queues = { "${queue.user}" })
+// public void getMessagesUser(@Payload String message) {
+// try {
+// System.out.println(message);
+// } catch (Exception e) {
+// throw new RuntimeException(e);
+// }
+// }
 
-//     @RabbitListener(queues = {"${queue.pilacoin.validado}"})
-//     public void getValidedPila(@Payload String message) {
-//         try {
-//             System.out.println(message);
+// @RabbitListener(queues = {"${queue.pilacoin.validado}"})
+// public void getValidedPila(@Payload String message) {
+// try {
+// System.out.println(message);
 
-//             ObjectMapper om = new ObjectMapper();
-//             ValidationPilaCoinJson pilaCoinValided = null;
-//             pilaCoinValided = om.readValue(message, ValidationPilaCoinJson.class);
+// ObjectMapper om = new ObjectMapper();
+// ValidationPilaCoinJson pilaCoinValided = null;
+// pilaCoinValided = om.readValue(message, ValidationPilaCoinJson.class);
 
-//             if (pilaCoinValided.getNomeValidador().contains("Gabriel Valentim")) {
-//                 System.out.println(pilaCoinValided.toString());
-//             }
-            
-//         } catch (Exception e) {
-//             throw new RuntimeException(e);
-//         }
-//     }
+// if (pilaCoinValided.getNomeValidador().contains("Gabriel Valentim")) {
+// System.out.println(pilaCoinValided.toString());
+// }
+
+// } catch (Exception e) {
+// throw new RuntimeException(e);
+// }
+// }
 // }
