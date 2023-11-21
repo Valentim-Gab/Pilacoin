@@ -80,12 +80,24 @@
   body {
     @apply bg-background text-foreground dark text-xs;
 
+    h1 {
+      @apply text-base;
+    }
+
     @media (min-width: $sm) {
       @apply text-base;
+
+      h1 {
+        @apply text-lg;
+      }
     }
 
     @media (min-width: $lg) {
       @apply text-lg;
+
+      h1 {
+        @apply text-xl;
+      }
     }
   }
 }

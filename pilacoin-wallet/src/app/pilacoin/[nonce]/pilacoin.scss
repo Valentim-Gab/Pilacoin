@@ -1,0 +1,22 @@
+@import "@/assets/styles/media-queries.scss";
+
+.pilacoin {
+  .section-pilacoin, .section-user {
+    @media (min-width: $lg) {
+      max-width: 800px;
+    }
+
+    @media (min-width: $xl2) {
+      max-width: 1200px;
+    }
+  }
+
+  .section-pilacoin {
+    p {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}

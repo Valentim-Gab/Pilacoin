@@ -51,7 +51,7 @@ const generateValidationMessage = ({
 
 const formSchema = z.object({
   ...generateValidationMessage({
-    fieldname: 'name',
+    fieldname: 'nome',
     min: 5,
     max: 20,
   }),
@@ -74,7 +74,7 @@ export default function FormUser({ user }: { user: User | undefined }) {
 
   const fields = [
     {
-      name: 'name' as const,
+      name: 'nome' as const,
       label: 'Nome',
       placeholder: 'Escreva o seu nome completo',
     },
@@ -94,7 +94,7 @@ export default function FormUser({ user }: { user: User | undefined }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: user?.username ?? '',
-      name: user?.name ?? '',
+      nome: user?.nome ?? '',
       email: user?.email ?? '',
     },
   })
