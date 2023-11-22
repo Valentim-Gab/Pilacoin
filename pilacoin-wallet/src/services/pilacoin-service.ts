@@ -3,6 +3,7 @@ import { Pilacoin } from "@/interfaces/pilacoin"
 export class PilacoinService {
   private readonly apiUrl = process.env.API_URL
   private readonly endpoint = `${this.apiUrl}/pilacoin`
+  public readonly price = 144.2
 
   public async findAll(): Promise<Pilacoin[] | null> {
     try {
