@@ -7,7 +7,7 @@ export class PilacoinService {
 
   public async findAll(): Promise<Pilacoin[] | null> {
     try {
-      const response = await fetch(this.endpoint)
+      const response = await fetch(this.endpoint, { cache: 'no-store' })
 
       if (response.ok && response.status == 200) {  
         const data = await response.json()

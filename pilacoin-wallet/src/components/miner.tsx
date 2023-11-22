@@ -10,7 +10,6 @@ import { Coin } from '@/interfaces/coin'
 import './miner.scss'
 
 export default function Miner({ coin }: { coin: Coin }) {
-  const realBalance = coin.balance * coin.price
   const mineredCoins = 0
   const mineredCoinsValue = mineredCoins * coin.price
   const [minerMessages, setMinerMessages] = useState('')
@@ -61,7 +60,7 @@ export default function Miner({ coin }: { coin: Coin }) {
             </p>
             <p>
               Saldo atual: {coin.balance.toFixed(2)} (
-              {realBalance.toLocaleString('pt-BR', {
+              {coin.price.toLocaleString('pt-BR', {
                 style: 'currency',
                 currency: 'BRL',
               })}

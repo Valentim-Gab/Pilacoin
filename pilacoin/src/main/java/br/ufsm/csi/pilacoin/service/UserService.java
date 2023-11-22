@@ -48,7 +48,7 @@ public class UserService {
     }
   }
 
-  @RabbitListener(queues = { "${queue.users}" })
+  // @RabbitListener(queues = { "${queue.users}" })
   public void getMessagesUser(@Payload String message) {
     try {
       System.out.println(message);
