@@ -11,7 +11,7 @@ import br.ufsm.csi.pilacoin.model.json.ValidationPilaCoinJson;
 @Service
 public class MessagesService {
 
-  // @RabbitListener(queues = { "${queue.user}" })
+  @RabbitListener(queues = { "${queue.user}" })
   public void getMessagesUser(@Payload String message) {
     try {
       System.out.println(message);
@@ -20,7 +20,16 @@ public class MessagesService {
     }
   }
 
-  // @RabbitListener(queues = { "${queue.pilacoin.validado}" })
+  // @RabbitListener(queues = { "${queue.report}" })
+  public void getReportUser(@Payload String message) {
+    try {
+      System.out.println(message);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  // @RabbitListener(queues = { "${queue.pilacoin.valided}" })
   public void getValidedPila(@Payload String message) {
     try {
       System.out.println(message);
@@ -32,7 +41,6 @@ public class MessagesService {
       if (pilaCoinValided.getNomeValidador().contains("Gabriel Valentim")) {
         System.out.println(pilaCoinValided.toString());
       }
-
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

@@ -15,7 +15,7 @@ public class DifficultService {
 
     DifficultJson difficultJson;
 
-    @RabbitListener(queues = {"${queue.dificuldade}"})
+    @RabbitListener(queues = { "${queue.difficult}" })
     public void receiveDifficult(@Payload String receivedDifficultJson) {
         ObjectMapper om = new ObjectMapper();
 

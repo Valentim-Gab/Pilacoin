@@ -4,7 +4,6 @@ import br.ufsm.csi.pilacoin.model.PilaCoin;
 import br.ufsm.csi.pilacoin.model.json.DifficultJson;
 import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -12,21 +11,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Random;
 
-//@Service
-public class MineracaoService {
+@Service
+public class MiningPilacoinService {
     private DifficultService difficultService;
     private CryptoUtil cryptoUtil;
     public RabbitTemplate rabbitTemplate;
     private final PilacoinService pilacoinService;
 
-    @Value("${queue.pilacoin.minerado}")
+    @Value("${queue.pilacoin.mined}")
     private String pilaMineradoQueue;
 
-    public MineracaoService(DifficultService difficultService, CryptoUtil cryptoUtil, RabbitTemplate rabbitTemplate,
+    public MiningPilacoinService(DifficultService difficultService, CryptoUtil cryptoUtil,
+            RabbitTemplate rabbitTemplate,
             PilacoinService pilacoinService) {
         this.difficultService = difficultService;
         this.cryptoUtil = cryptoUtil;
@@ -42,7 +41,7 @@ public class MineracaoService {
                 try {
                     while (true) {
                         if (difficultService.difficultJson == null) {
-                            Thread.sleep(3000);
+                            Thread.sleep(500);
 
                             continue;
                         }
