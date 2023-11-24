@@ -20,7 +20,7 @@ public class MessagesService {
     }
   }
 
-  // @RabbitListener(queues = { "${queue.report}" })
+  @RabbitListener(queues = { "${queue.report}" })
   public void getReportUser(@Payload String message) {
     try {
       System.out.println(message);

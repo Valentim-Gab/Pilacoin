@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -15,9 +17,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.ufsm.csi.pilacoin.model.User;
+import br.ufsm.csi.pilacoin.model.json.QueryJson;
 
 @Service
 public class UserService {
+  @Value("${queue.query}")
+  private String query;
+
+  private RabbitTemplate rabbitTemplate;
+
+  public UserService(RabbitTemplate rabbitTemplate) {
+    this.rabbitTemplate = rabbitTemplate;
+  }
+
   public List<User> findAll() {
     List<User> userList = new ArrayList<>();
 
@@ -48,10 +60,26 @@ public class UserService {
     }
   }
 
-  // @RabbitListener(queues = { "${queue.users}" })
-  public void getMessagesUser(@Payload String message) {
+  public void findAllByQuery() {
     try {
-      System.out.println(message);
+      ObjectMapper om = new ObjectMapper();
+
+      QueryJson queryJson = QueryJson.builder()
+          .idQuey(1l)
+          .nomeUsuario("Gabriel_Valentim")
+          .tipoQuery("USUARIOS")
+          .build();
+
+      rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @RabbitListener(queues = { "${queue.user.query}" })
+  public void showUsersQuery(@Payload String strJson) {
+    try {
+      System.out.println(strJson);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

@@ -22,6 +22,7 @@ public class UserController {
 
   @GetMapping()
   public List<User> findAll() {
+    userService.findAllByQuery();
     return userService.findAll();
   }
 

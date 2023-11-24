@@ -26,7 +26,7 @@ import br.ufsm.csi.pilacoin.model.json.DifficultJson;
 import br.ufsm.csi.pilacoin.model.json.ValidationBlockJson;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
 
-// @Service
+@Service
 public class ValidationBlockService {
   @Value("${queue.bloco.mined}")
   private String blockMinedQueue;

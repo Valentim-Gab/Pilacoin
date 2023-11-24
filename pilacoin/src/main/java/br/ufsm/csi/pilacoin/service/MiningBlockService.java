@@ -17,7 +17,7 @@ import br.ufsm.csi.pilacoin.model.json.BlockJson;
 import br.ufsm.csi.pilacoin.model.json.DifficultJson;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
 
-@Service
+// @Service
 public class MiningBlockService {
   private DifficultService difficultService;
   private CryptoUtil cryptoUtil;
