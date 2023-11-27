@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.ufsm.csi.pilacoin.model.User;
+import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
 import br.ufsm.csi.pilacoin.model.json.QueryJson;
 
 @Service
@@ -33,10 +34,12 @@ public class UserService {
   public List<User> findAll() {
     List<User> userList = new ArrayList<>();
 
-    userList.add(new User(null, "chave publica aqui".getBytes(), "joao_oli"));
-    userList.add(new User(null, "chave publica aqui".getBytes(), "Luiz"));
-    userList.add(new User(null, "chave publica aqui".getBytes(), "londeroedu"));
-    userList.add(new User(null, "chave publica aqui".getBytes(), "joao_leo"));
+    // userList.add(new User(null, "chave publica aqui".getBytes(), "joao_oli"));
+    // userList.add(new User(null, "chave publica aqui".getBytes(), "Luiz"));
+    // userList.add(new User(null, "chave publica aqui".getBytes(), "londeroedu"));
+    // userList.add(new User(null, "chave publica aqui".getBytes(), "joao_leo"));
+
+    findAllByQuery();
 
     return userList;
   }
@@ -65,7 +68,7 @@ public class UserService {
       ObjectMapper om = new ObjectMapper();
 
       QueryJson queryJson = QueryJson.builder()
-          .idQuey(1l)
+          .idQuery(1l)
           .nomeUsuario("Gabriel_Valentim")
           .tipoQuery("USUARIOS")
           .build();
@@ -79,6 +82,10 @@ public class UserService {
   @RabbitListener(queues = { "${queue.user.query}" })
   public void showUsersQuery(@Payload String strJson) {
     try {
+      // ObjectMapper om = new ObjectMapper();
+      // QueryJson queryJson = om.readValue(strJson, QueryJson.class);
+
+      // System.out.println("\n\n[USERS]: " + queryJson.getUsuariosResult());
       System.out.println(strJson);
     } catch (Exception e) {
       throw new RuntimeException(e);

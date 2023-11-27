@@ -22,7 +22,6 @@ public class PilacoinController {
 
   @GetMapping()
   public List<PilaCoin> findAll() {
-    System.out.println("Bateu");
     return pilacoinService.findAll();
   }
 
