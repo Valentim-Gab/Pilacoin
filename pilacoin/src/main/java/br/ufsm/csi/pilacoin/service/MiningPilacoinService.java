@@ -69,8 +69,6 @@ public class MiningPilacoinService {
                             ObjectMapper mapper = new ObjectMapper();
                             String pilaStr = mapper.writeValueAsString(pilaJson);
 
-                            // pilacoinService.save(pilaJson);
-
                             System.out.println("\n\n[MINED PILA]: " + pilaStr);
 
                             rabbitTemplate.convertAndSend(pilaMineradoQueue, pilaStr);

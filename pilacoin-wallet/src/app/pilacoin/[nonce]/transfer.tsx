@@ -5,9 +5,9 @@ import FormBtn from '../../../components/form-btn'
 import { User } from '@/interfaces/user'
 import { Pilacoin } from '@/interfaces/pilacoin'
 import { twMerge } from 'tailwind-merge'
-import { UserService } from '@/services/user-service'
 import { Transaction } from '@/interfaces/transaction'
 import { PilacoinService } from '@/services/pilacoin-service'
+import { useRouter } from 'next/navigation'
 
 export interface TransferProps {
   userList: User[]
@@ -18,6 +18,7 @@ export interface TransferProps {
 export default function Transfer({ userList, pilacoin, userLogged }: TransferProps) {
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null)
   const pilacoinService = new PilacoinService()
+  const router = useRouter()
 
   function handleSelectUser(user: User) {
     setSelectedUser(user)
@@ -33,7 +34,16 @@ export default function Transfer({ userList, pilacoin, userLogged }: TransferPro
       noncePila: pilacoin.nonce,
     }
 
-    pilacoinService.transferOne(transaction)
+    pilacoinService.transferOne(transaction).then((res) => {
+      if (res) {
+        alert('Transferência realizada com sucesso!')
+
+        router.push('/trade')
+        router.refresh()
+      } else {
+        alert('Erro ao realizar transferência!')
+      }
+    })
   }
 
   return (

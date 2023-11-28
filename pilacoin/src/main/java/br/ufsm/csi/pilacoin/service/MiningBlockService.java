@@ -69,9 +69,11 @@ public class MiningBlockService {
               ObjectMapper mapper = new ObjectMapper();
               String blockStr = mapper.writeValueAsString(minedBlock);
 
-              System.out.println("\n\n[BLOCO MINERADO]" + blockStr);
+              System.out.println("\n\n[BLOCO MINERADO]: " + blockStr);
 
               rabbitTemplate.convertAndSend(blockMinedQueue, blockStr);
+
+              Thread.sleep(1000);
             }
           }
         } catch (InterruptedException | JsonProcessingException e) {

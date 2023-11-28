@@ -25,7 +25,7 @@ import java.security.NoSuchAlgorithmException;
 @Component
 public class CryptoUtil {
     private ObjectMapper om = new ObjectMapper();
-    private final String keyFilePath = "src/main/resources/static/keys";
+    private String keyFilePath = "src/main/resources/static/keys";
 
     public BigInteger generatehash(Object object) {
         try {
@@ -53,6 +53,11 @@ public class CryptoUtil {
 
     public KeyPair generateKeys() {
         try {
+            File pilacoinDir = new File("pilacoin");
+
+            if (pilacoinDir.exists() && pilacoinDir.isDirectory())
+                keyFilePath = "pilacoin/" + keyFilePath;
+
             File file = new File(keyFilePath + "/keypair.der");
             KeyPair pair = null;
 

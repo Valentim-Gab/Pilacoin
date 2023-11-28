@@ -102,8 +102,21 @@ public class PilacoinService {
     }
   }
 
+  public void deleteByNonce(String nonce) {
+    Optional<PilaCoin> pilaCoin = pRepository.findPilaCoinByNonce(nonce);
+
+    if (pilaCoin.isPresent()) {
+      pRepository.delete(pilaCoin.get());
+    } else {
+      System.out.println("\n\n[ERROR]: PilaCoin não salvo no Banco");
+    }
+  }
+
   public void transfer(TransactionJson transaction) {
     try {
+      transaction.setChaveUsuarioOrigem(cryptoUtil.generateKeys().getPublic().getEncoded());
+      transaction.setDataTransacao(new Date());
+
       ObjectMapper mapper = new ObjectMapper();
       String transactionStr = mapper.writeValueAsString(transaction);
 
@@ -114,15 +127,13 @@ public class PilacoinService {
       byte[] signature = cipher.doFinal(md.digest(transactionStr.getBytes(StandardCharsets.UTF_8)));
 
       Base64.getEncoder().encodeToString(signature);
-
       transaction.setAssinatura(signature);
-      transaction.setChaveUsuarioOrigem(cryptoUtil.generateKeys().getPublic().getEncoded());
-      transaction.setDataTransacao(new Date());
 
-      // System.out.println("\n\n[TRANSFER]: " + transaction.toString());
+      System.out.println("\n\n[TRANSFER DESTINATION]: " + transaction.getNomeUsuarioDestino());
 
-      // rabbitTemplate.convertAndSend(transactionQueue,
-      // mapper.writeValueAsString(transaction));
+      rabbitTemplate.convertAndSend(transactionQueue, mapper.writeValueAsString(transaction));
+
+      deleteByNonce(transaction.getNoncePila());
     } catch (Exception e) {
       e.printStackTrace();
     }
