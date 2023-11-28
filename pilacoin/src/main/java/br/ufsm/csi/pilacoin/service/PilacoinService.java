@@ -36,101 +36,59 @@ public class PilacoinService {
   private final PilaCoinRepository pRepository;
   private final CryptoUtil cryptoUtil;
   public RabbitTemplate rabbitTemplate;
-  private final MessagesService messagesService;
 
   @Value("${queue.transfer}")
   private String transactionQueue;
 
-  public PilacoinService(PilaCoinRepository pRepository, CryptoUtil cryptoUtil, RabbitTemplate rabbitTemplate,
-      MessagesService messagesService) {
+  public PilacoinService(PilaCoinRepository pRepository, CryptoUtil cryptoUtil, RabbitTemplate rabbitTemplate) {
     this.pRepository = pRepository;
     this.cryptoUtil = cryptoUtil;
     this.rabbitTemplate = rabbitTemplate;
-    this.messagesService = messagesService;
   }
 
-  public PilaCoin save(PilaCoinJson pilaCoinJson, PilaCoin.StatusPila status) {
-    PilaCoin pilaCoin = PilaCoin.builder()
-        .chaveCriador(pilaCoinJson.getChaveCriador())
-        .dataCriacao(pilaCoinJson.getDataCriacao())
-        .nomeCriador(pilaCoinJson.getNomeCriador())
-        .nonce(pilaCoinJson.getNonce())
-        .status(status)
-        .build();
+  public PilaCoin save(PilaCoinJson pilaCoinJson) {
+    Optional<PilaCoin> existingPilaCoin = pRepository.findPilaCoinByNonce(pilaCoinJson.getNonce());
+    PilaCoin pilacoin = null;
 
-    return pRepository.save(pilaCoin);
+    if (existingPilaCoin.isPresent()) {
+      pilacoin = existingPilaCoin.get();
+      pilacoin.setStatus(pilaCoinJson.getStatus());
+    } else {
+      pilacoin = PilaCoin.builder()
+          .chaveCriador(pilaCoinJson.getChaveCriador())
+          .dataCriacao(pilaCoinJson.getDataCriacao())
+          .nomeCriador(pilaCoinJson.getNomeCriador())
+          .nonce(pilaCoinJson.getNonce())
+          .status(pilaCoinJson.getStatus())
+          .build();
+    }
+
+    return pRepository.save(pilacoin);
   }
 
   public List<PilaCoin> findAll() {
     return pRepository.findAll();
   }
 
-  @RabbitListener(queues = { "${queue.user.query}" })
-  public ResponseEntity<Object> findOneByNonce(String nonce, @Payload String strJson) {
-    AtomicReference<ResponseEntity<Object>> responseEntity = new AtomicReference<>(null);
+  public ResponseEntity<Object> findOneByNonce(String nonce) {
+    Optional<PilaCoin> pilaCoin = pRepository.findPilaCoinByNonce(nonce);
 
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          Optional<PilaCoin> pilaCoin = pRepository.findPilaCoinByNonce(nonce);
+    try {
+      if (pilaCoin.isPresent()) {
+        return new ResponseEntity<>(pilaCoin.get(), HttpStatus.OK);
+      } else {
+        Map<String, Object> jsonData = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
 
-          if (pilaCoin.isPresent()) {
-            QueryJson queryJson = QueryJson.builder()
-                .idQuery(2l)
-                .nomeUsuario("Gabriel_Valentim")
-                .tipoQuery(QueryJson.TypeQuery.PILA)
-                .nonce(nonce)
-                .build();
+        jsonData.put("error", "Pilacoin não encontrado");
 
-            ObjectMapper om = new ObjectMapper();
-
-            rabbitTemplate.convertAndSend(transactionQueue, om.writeValueAsString(queryJson));
-
-            while (true) {
-              if (strJson == null) {
-                Thread.sleep(500);
-
-                continue;
-              }
-
-              QueryJson queryJsonResponse = om.readValue(strJson, QueryJson.class);
-
-              if (queryJsonResponse.getIdQuery() != 2l) {
-                continue;
-              }
-
-              PilaCoin updatedPilaCoin = PilaCoin.builder()
-                  .chaveCriador(queryJsonResponse.getPilasResult().get(0).getChaveCriador())
-                  .dataCriacao(queryJsonResponse.getPilasResult().get(0).getDataCriacao())
-                  .nomeCriador(queryJsonResponse.getPilasResult().get(0).getNomeCriador())
-                  .nonce(queryJsonResponse.getPilasResult().get(0).getNonce())
-                  .status(queryJsonResponse.getPilasResult().get(0).getStatus())
-                  .build();
-
-              pRepository.save(updatedPilaCoin);
-
-              System.out.println("\n\n[UPDATED PILACOIN]: " + updatedPilaCoin.toString());
-
-              responseEntity.set(new ResponseEntity<>(updatedPilaCoin, HttpStatus.OK));
-
-              break;
-            }
-
-            Map<String, Object> jsonData = new HashMap<>();
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            jsonData.put("error", "Pilacoin não encontrado");
-
-            responseEntity.set(new ResponseEntity<>(objectMapper.writeValueAsString(jsonData), HttpStatus.BAD_REQUEST));
-          }
-        } catch (JsonProcessingException | InterruptedException e) {
-          responseEntity.set(new ResponseEntity<>("Erro no servidor", HttpStatus.BAD_REQUEST));
-        }
+        return new ResponseEntity<>(objectMapper.writeValueAsString(jsonData), HttpStatus.BAD_REQUEST);
       }
-    }).start();
+    } catch (
 
-    return responseEntity.get();
+    JsonProcessingException e) {
+      return new ResponseEntity<>("Erro no servidor", HttpStatus.BAD_REQUEST);
+    }
   }
 
   public void update(PilaCoinJson pilaCoinJson, PilaCoin.StatusPila status) {

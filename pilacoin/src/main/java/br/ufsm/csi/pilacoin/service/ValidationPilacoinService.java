@@ -106,30 +106,29 @@ public class ValidationPilacoinService {
         }
     }
 
-    // @PostConstruct
-    // public void receiveValidedPila() {
-    // new Thread(new Runnable() {
-    // @Override
-    // public void run() {
-    // try {
-    // while (true) {
-    // QueryJson queryJson = QueryJson.builder()
-    // .idQuery(2l)
-    // .nomeUsuario("Gabriel_Valentim")
-    // .tipoQuery(QueryJson.TypeQuery.PILA)
-    // .build();
+    @PostConstruct
+    public void receiveValidedPila() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        QueryJson queryJson = QueryJson.builder()
+                                .idQuery(2l)
+                                .nomeUsuario("Gabriel_Valentim")
+                                .tipoQuery(QueryJson.TypeQuery.PILA)
+                                .build();
 
-    // ObjectMapper om = new ObjectMapper();
+                        ObjectMapper om = new ObjectMapper();
 
-    // rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
+                        rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
 
-    // // pilacoinService.update(vPilaCoin.getPilaCoinJson(),
-    // // PilaCoin.StatusPila.VALIDO);
-    // }
-    // } catch (Exception e) {
-    // throw new RuntimeException(e);
-    // }
-    // }
-    // }).start();
-    // }
+                        Thread.sleep(10000);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+    }
 }

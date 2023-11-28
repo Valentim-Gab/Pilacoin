@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,9 +18,13 @@ import br.ufsm.csi.pilacoin.model.json.ValidationPilaCoinJson;
 @Service
 public class MessagesService {
   public List<User> userList = new ArrayList<>();
-  public PilaCoinJson pilaCoinJsonToUpdate;
   private final Long typeQueryUser = 1l;
   private final Long typeQueryPila = 2l;
+  private final PilacoinService pilacoinService;
+
+  public MessagesService(PilacoinService pilacoinService) {
+    this.pilacoinService = pilacoinService;
+  }
 
   @RabbitListener(queues = { "${queue.user}" })
   public void getMessagesUser(@Payload String message) {
@@ -31,17 +36,21 @@ public class MessagesService {
   }
 
   @RabbitListener(queues = { "${queue.user.query}" })
-  public void showUsersQuery(@Payload String strJson) {
+  public void responseQueryUser(@Payload String strJson) {
     try {
       ObjectMapper om = new ObjectMapper();
       QueryJson queryJson = om.readValue(strJson, QueryJson.class);
 
-      if (queryJson.getIdQuery() == null)
+      if (queryJson.getIdQuery() == null) {
         return;
-      else if (queryJson.getIdQuery() == typeQueryUser)
+      } else if (queryJson.getIdQuery() == typeQueryUser) {
         userList = queryJson.getUsuariosResult();
-      // else if (queryJson.getIdQuery() == typeQueryPila)
-      // pilaCoinJsonToUpdate = queryJson.getPilasResult().get(0);
+      } else if (queryJson.getIdQuery() == typeQueryPila) {
+        for (PilaCoinJson pilacoin : queryJson.getPilasResult()) {
+          if (pilacoin.getNomeCriador().equals("Gabriel_Valentim"))
+            pilacoinService.save(pilacoin);
+        }
+      }
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

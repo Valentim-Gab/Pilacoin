@@ -30,7 +30,7 @@ public class PilacoinController {
 
   @GetMapping("{nonce}")
   public ResponseEntity<Object> findOneByNonce(@PathVariable("nonce") String nonce) {
-    return pilacoinService.findOneByNonce(nonce, null);
+    return pilacoinService.findOneByNonce(nonce);
   }
 
   @PostMapping("transfer")
