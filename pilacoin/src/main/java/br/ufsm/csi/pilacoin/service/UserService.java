@@ -17,7 +17,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.ufsm.csi.pilacoin.model.User;
-import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
 import br.ufsm.csi.pilacoin.model.json.QueryJson;
 
 @Service
@@ -27,21 +26,21 @@ public class UserService {
 
   private RabbitTemplate rabbitTemplate;
 
-  public UserService(RabbitTemplate rabbitTemplate) {
+  MessagesService messagesService;
+
+  public UserService(RabbitTemplate rabbitTemplate, MessagesService messagesService) {
     this.rabbitTemplate = rabbitTemplate;
+    this.messagesService = messagesService;
   }
 
   public List<User> findAll() {
-    List<User> userList = new ArrayList<>();
-
-    // userList.add(new User(null, "chave publica aqui".getBytes(), "joao_oli"));
-    // userList.add(new User(null, "chave publica aqui".getBytes(), "Luiz"));
-    // userList.add(new User(null, "chave publica aqui".getBytes(), "londeroedu"));
-    // userList.add(new User(null, "chave publica aqui".getBytes(), "joao_leo"));
-
     findAllByQuery();
 
-    return userList;
+    if (!this.messagesService.userList.isEmpty()) {
+      return this.messagesService.userList;
+    }
+
+    return findAll();
   }
 
   public ResponseEntity<Object> findOne(String name) {
@@ -70,23 +69,10 @@ public class UserService {
       QueryJson queryJson = QueryJson.builder()
           .idQuery(1l)
           .nomeUsuario("Gabriel_Valentim")
-          .tipoQuery("USUARIOS")
+          .tipoQuery(QueryJson.TypeQuery.USUARIOS)
           .build();
 
       rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @RabbitListener(queues = { "${queue.user.query}" })
-  public void showUsersQuery(@Payload String strJson) {
-    try {
-      // ObjectMapper om = new ObjectMapper();
-      // QueryJson queryJson = om.readValue(strJson, QueryJson.class);
-
-      // System.out.println("\n\n[USERS]: " + queryJson.getUsuariosResult());
-      System.out.println(strJson);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

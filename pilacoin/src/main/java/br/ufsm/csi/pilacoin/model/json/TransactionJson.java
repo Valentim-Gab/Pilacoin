@@ -21,6 +21,6 @@ public class TransactionJson {
   private byte[] assinatura;
   private String noncePila;
   private Date dataTransacao;
-  private int id;
+  private Long id;
   private String status;
 }

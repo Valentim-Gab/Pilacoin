@@ -21,10 +21,17 @@ import lombok.NoArgsConstructor;
 public class QueryJson {
   private Long idQuery;
   private String nomeUsuario;
-  private String tipoQuery;
+  private String usuario;
+  private TypeQuery tipoQuery;
   private PilaCoin.StatusPila status;
   private String usuarioMinerador;
   private String nonce;
   private Long idBloco;
   private List<User> usuariosResult;
+  private List<PilaCoinJson> pilasResult;
+  private List<BlockJson> blocosResult;
+
+  public enum TypeQuery {
+    USUARIOS, PILA, BLOCO
+  }
 }

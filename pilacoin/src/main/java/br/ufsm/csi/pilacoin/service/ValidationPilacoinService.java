@@ -6,6 +6,8 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.Date;
+import java.util.Random;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -24,16 +26,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import br.ufsm.csi.pilacoin.model.PilaCoin;
 import br.ufsm.csi.pilacoin.model.json.DifficultJson;
 import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
+import br.ufsm.csi.pilacoin.model.json.QueryJson;
 import br.ufsm.csi.pilacoin.model.json.ValidationPilaCoinJson;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
+import jakarta.annotation.PostConstruct;
 
-// @Service
+@Service
 public class ValidationPilacoinService {
     @Value("${queue.pilacoin.mined}")
     private String pilaMineradoQueue;
 
     @Value("${queue.pilacoin.valided}")
     private String pilaValidedQueue;
+
+    @Value("${queue.query}")
+    private String query;
 
     private DifficultService difficultService;
     private RabbitTemplate rabbitTemplate;
@@ -48,7 +55,7 @@ public class ValidationPilacoinService {
         this.pilacoinService = pilacoinService;
     }
 
-    @RabbitListener(queues = { "${queue.pilacoin.mined}" })
+    // @RabbitListener(queues = { "${queue.pilacoin.mined}" })
     public void verifyMinedPila(@Payload String strJson) {
         try {
             ObjectMapper om = new ObjectMapper();
@@ -99,27 +106,30 @@ public class ValidationPilacoinService {
         }
     }
 
-    // @RabbitListener(queues = { "${queue.pilacoin.valided.user}" })
-    // public void receiveValidedPila(@Payload String strJson) {
+    // @PostConstruct
+    // public void receiveValidedPila() {
+    // new Thread(new Runnable() {
+    // @Override
+    // public void run() {
     // try {
+    // while (true) {
+    // QueryJson queryJson = QueryJson.builder()
+    // .idQuery(2l)
+    // .nomeUsuario("Gabriel_Valentim")
+    // .tipoQuery(QueryJson.TypeQuery.PILA)
+    // .build();
+
     // ObjectMapper om = new ObjectMapper();
-    // ValidationPilaCoinJson vPilaCoin = null;
-    // vPilaCoin = om.readValue(strJson, ValidationPilaCoinJson.class);
-    // String nomeCriador = vPilaCoin.getPilaCoinJson().getNomeCriador();
 
-    // if (!nomeCriador.equals("Gabriel_Valentim")) {
-    // System.out.println("\n\n[RECEIVED]: " + strJson);
-    // rabbitTemplate.convertAndSend(pilaValidedUserQueue, strJson);
+    // rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
 
-    // return;
+    // // pilacoinService.update(vPilaCoin.getPilaCoinJson(),
+    // // PilaCoin.StatusPila.VALIDO);
     // }
-
-    // System.out.println("\n\n[ATUALIZANDO]: " + strJson);
-
-    // pilacoinService.update(vPilaCoin.getPilaCoinJson(),
-    // PilaCoin.StatusPila.VALIDO);
     // } catch (Exception e) {
-    // e.printStackTrace();
+    // throw new RuntimeException(e);
     // }
+    // }
+    // }).start();
     // }
 }

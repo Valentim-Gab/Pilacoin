@@ -5,14 +5,19 @@ import FormBtn from '../../../components/form-btn'
 import { User } from '@/interfaces/user'
 import { Pilacoin } from '@/interfaces/pilacoin'
 import { twMerge } from 'tailwind-merge'
+import { UserService } from '@/services/user-service'
+import { Transaction } from '@/interfaces/transaction'
+import { PilacoinService } from '@/services/pilacoin-service'
 
 export interface TransferProps {
   userList: User[]
   pilacoin: Pilacoin
+  userLogged: User
 }
 
-export default function Transfer({ userList, pilacoin }: TransferProps) {
+export default function Transfer({ userList, pilacoin, userLogged }: TransferProps) {
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null)
+  const pilacoinService = new PilacoinService()
 
   function handleSelectUser(user: User) {
     setSelectedUser(user)
@@ -21,7 +26,14 @@ export default function Transfer({ userList, pilacoin }: TransferProps) {
   function transfer() {
     if (!selectedUser) return
 
-    console.log(selectedUser)
+    const transaction: Transaction = {
+      chaveUsuarioDestino: selectedUser.chavePublica!,
+      nomeUsuarioOrigem: userLogged.nome,
+      nomeUsuarioDestino: selectedUser.nome,
+      noncePila: pilacoin.nonce,
+    }
+
+    pilacoinService.transferOne(transaction)
   }
 
   return (
