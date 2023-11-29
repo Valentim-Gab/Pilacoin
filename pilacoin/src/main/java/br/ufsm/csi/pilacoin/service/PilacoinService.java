@@ -70,6 +70,10 @@ public class PilacoinService {
     return pRepository.findAll();
   }
 
+  public Long findAllCount() {
+    return pRepository.count();
+  }
+
   public ResponseEntity<Object> findOneByNonce(String nonce) {
     Optional<PilaCoin> pilaCoin = pRepository.findPilaCoinByNonce(nonce);
 

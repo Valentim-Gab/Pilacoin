@@ -53,11 +53,6 @@ public class CryptoUtil {
 
     public KeyPair generateKeys() {
         try {
-            File pilacoinDir = new File("pilacoin");
-
-            if (pilacoinDir.exists() && pilacoinDir.isDirectory())
-                keyFilePath = "pilacoin/" + keyFilePath;
-
             File file = new File(keyFilePath + "/keypair.der");
             KeyPair pair = null;
 

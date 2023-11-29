@@ -1,6 +1,5 @@
 package br.ufsm.csi.pilacoin.service;
 
-import br.ufsm.csi.pilacoin.model.PilaCoin;
 import br.ufsm.csi.pilacoin.model.json.DifficultJson;
 import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
@@ -14,23 +13,20 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
 
-// @Service
+@Service
 public class MiningPilacoinService {
     private DifficultService difficultService;
     private CryptoUtil cryptoUtil;
     public RabbitTemplate rabbitTemplate;
-    private final PilacoinService pilacoinService;
 
     @Value("${queue.pilacoin.mined}")
     private String pilaMineradoQueue;
 
     public MiningPilacoinService(DifficultService difficultService, CryptoUtil cryptoUtil,
-            RabbitTemplate rabbitTemplate,
-            PilacoinService pilacoinService) {
+            RabbitTemplate rabbitTemplate) {
         this.difficultService = difficultService;
         this.cryptoUtil = cryptoUtil;
         this.rabbitTemplate = rabbitTemplate;
-        this.pilacoinService = pilacoinService;
     }
 
     @PostConstruct

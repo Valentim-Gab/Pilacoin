@@ -1,11 +1,65 @@
+'use client'
+
 import React from 'react'
 import Cryptocurrency from '@/components/cryptocurrency'
 import './home.scss'
-import { CoinService } from '@/services/coin-service'
+import { Client } from '@stomp/stompjs'
+import { PilacoinService } from '@/services/pilacoin-service'
 
-export default async function Home() {
-  const coinService = new CoinService()
-  const coins = await coinService.getAllCoins()
+export default function Home() {
+  const pilacoinService = new PilacoinService()
+  const [totalPilas, setTotalPilas] = React.useState(0)
+
+  const socket = new Client({
+    brokerURL: 'ws://localhost:8080/update',
+    // debug: function (str) {
+    //   console.log(str)
+    // },
+    reconnectDelay: 5000,
+  })
+
+  socket.onConnect = (frame) => {
+    //console.log('Conectado ao servidor WebSocket')
+    socket.subscribe('/topic/data', (message) => {
+      setTotalPilas(Number(message.body))
+    })
+  }
+
+  socket.onDisconnect = (frame) => {
+    if (frame) {
+      console.log(
+        'Desconectado do servidor WebSocket. Motivo:',
+        frame || 'Desconhecido'
+      )
+    } else {
+      console.log('Desconectado do servidor WebSocket')
+    }
+  }
+
+  socket.onStompError = (frame) => {
+    console.error('Erro no WebSocket:', frame.headers.message)
+  }
+
+  socket.onWebSocketClose = (event) => {
+    console.log('Conexão WebSocket fechada:', event)
+  }
+
+  socket.activate()
+
+  const coinsList = [
+    {
+      name: 'PilaCoin',
+      icon: 'icon-[solar--chat-round-money-bold]',
+      price: totalPilas * pilacoinService.price,
+      balance: totalPilas,
+    },
+    {
+      name: 'Real Brasileiro',
+      image: '/images/icons/brl-icon.png',
+      price: 1.0,
+      balance: 0.0,
+    },
+  ]
 
   return (
     <main className="home flex min-h-screen flex-col items-center flex-1 self-stretch lg:py-8">
@@ -20,8 +74,8 @@ export default async function Home() {
           </div>
         </div>
         <ul className="w-full">
-          {coins &&
-            coins.map((coin, index) => (
+          {coinsList &&
+            coinsList.map((coin, index) => (
               <li key={index}>
                 <Cryptocurrency
                   name={coin.name}

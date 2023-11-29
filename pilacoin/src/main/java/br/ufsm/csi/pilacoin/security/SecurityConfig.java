@@ -1,5 +1,6 @@
 package br.ufsm.csi.pilacoin.security;
 
+import java.net.http.WebSocket;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,9 @@ public class SecurityConfig {
               authorizeConfig.requestMatchers(HttpMethod.GET, "/pilacoin/**").permitAll();
               authorizeConfig.requestMatchers(HttpMethod.POST, "/pilacoin/transfer").permitAll();
               authorizeConfig.requestMatchers(HttpMethod.GET, "/user/**").permitAll();
+              authorizeConfig.requestMatchers("/ws/**").permitAll();
+              authorizeConfig.requestMatchers("/update/**").permitAll();
+              authorizeConfig.requestMatchers("/error/**").permitAll();
               authorizeConfig.anyRequest().authenticated();
             })
         .exceptionHandling(
