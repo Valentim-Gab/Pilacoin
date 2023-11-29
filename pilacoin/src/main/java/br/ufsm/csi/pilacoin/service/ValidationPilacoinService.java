@@ -55,7 +55,7 @@ public class ValidationPilacoinService {
         this.pilacoinService = pilacoinService;
     }
 
-    // @RabbitListener(queues = { "${queue.pilacoin.mined}" })
+    @RabbitListener(queues = { "${queue.pilacoin.mined}" })
     public void verifyMinedPila(@Payload String strJson) {
         try {
             ObjectMapper om = new ObjectMapper();
@@ -82,10 +82,9 @@ public class ValidationPilacoinService {
                 Cipher cipher = Cipher.getInstance("RSA");
                 cipher.init(Cipher.ENCRYPT_MODE, cryptoUtil.generateKeys().getPrivate());
 
+                String newPilaStr = om.writeValueAsString(pilaCoin);
                 MessageDigest md = MessageDigest.getInstance("SHA-256");
-                byte[] signature = cipher.doFinal(md.digest(strJson.getBytes(StandardCharsets.UTF_8)));
-
-                Base64.getEncoder().encodeToString(signature);
+                byte[] signature = cipher.doFinal(md.digest(newPilaStr.getBytes(StandardCharsets.UTF_8)));
 
                 ValidationPilaCoinJson vPilaCoin = ValidationPilaCoinJson.builder()
                         .pilaCoinJson(pilaCoin)
@@ -123,7 +122,7 @@ public class ValidationPilacoinService {
 
                         rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
 
-                        // Thread.sleep(10000);
+                        Thread.sleep(10000);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);

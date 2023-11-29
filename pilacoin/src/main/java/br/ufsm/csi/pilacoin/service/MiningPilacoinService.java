@@ -13,7 +13,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
 
-@Service
+// @Service
 public class MiningPilacoinService {
     private DifficultService difficultService;
     private CryptoUtil cryptoUtil;

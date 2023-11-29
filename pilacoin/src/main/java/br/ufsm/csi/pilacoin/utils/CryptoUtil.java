@@ -24,7 +24,6 @@ import java.security.NoSuchAlgorithmException;
 
 @Component
 public class CryptoUtil {
-    private ObjectMapper om = new ObjectMapper();
     private String keyFilePath = "src/main/resources/static/keys";
 
     public BigInteger generatehash(Object object) {
@@ -34,21 +33,18 @@ public class CryptoUtil {
             if (object instanceof String) {
                 json = (String) object;
             } else {
-                this.om = new ObjectMapper();
-                this.om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-                json = this.om.writeValueAsString(object);
+                ObjectMapper om = new ObjectMapper();
+                json = om.writeValueAsString(object);
             }
 
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            BigInteger hash = new BigInteger(md.digest(json.getBytes(StandardCharsets.UTF_8)));
 
-            return hash.abs();
+            return new BigInteger(md.digest(json.getBytes(StandardCharsets.UTF_8))).abs();
         } catch (JsonProcessingException | NoSuchAlgorithmException e) {
             e.printStackTrace();
-        }
 
-        return null;
+            return null;
+        }
     }
 
     public KeyPair generateKeys() {
