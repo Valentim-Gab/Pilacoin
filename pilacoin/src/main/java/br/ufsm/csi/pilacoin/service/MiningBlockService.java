@@ -4,10 +4,12 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
 
+import br.ufsm.csi.pilacoin.model.json.TypeActionWsJson;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,19 +19,23 @@ import br.ufsm.csi.pilacoin.model.json.BlockJson;
 import br.ufsm.csi.pilacoin.model.json.DifficultJson;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
 
-// @Service
+@Service
 public class MiningBlockService {
   private DifficultService difficultService;
   private CryptoUtil cryptoUtil;
   public RabbitTemplate rabbitTemplate;
 
+  private final SimpMessagingTemplate template;
+
   @Value("${queue.bloco.mined}")
   private String blockMinedQueue;
 
-  public MiningBlockService(DifficultService difficultService, CryptoUtil cryptoUtil, RabbitTemplate rabbitTemplate) {
+  public MiningBlockService(DifficultService difficultService, CryptoUtil cryptoUtil, RabbitTemplate rabbitTemplate,
+                            SimpMessagingTemplate template) {
     this.difficultService = difficultService;
     this.cryptoUtil = cryptoUtil;
     this.rabbitTemplate = rabbitTemplate;
+    this.template = template;
   }
 
   @RabbitListener(queues = { "${queue.block.find}" })
@@ -71,9 +77,18 @@ public class MiningBlockService {
 
               System.out.println("\n\n[BLOCO MINERADO]: " + blockStr);
 
+              TypeActionWsJson typeActionWsJson = TypeActionWsJson.builder()
+                      .message("BLOCO MINERADO")
+                      .type(TypeActionWsJson.TypeAction.MINER_BLOCK)
+                      .timestamp(System.currentTimeMillis())
+                      .build();
+
+              template.convertAndSend("/topic/pilacoin",
+                      mapper.writeValueAsString(typeActionWsJson));
+
               rabbitTemplate.convertAndSend(blockMinedQueue, blockStr);
 
-              Thread.sleep(1000);
+              Thread.sleep(10000);
             }
           }
         } catch (InterruptedException | JsonProcessingException e) {

@@ -14,20 +14,18 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import br.ufsm.csi.pilacoin.model.json.*;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.ufsm.csi.pilacoin.model.PilaCoin;
-import br.ufsm.csi.pilacoin.model.json.DifficultJson;
-import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
-import br.ufsm.csi.pilacoin.model.json.QueryJson;
-import br.ufsm.csi.pilacoin.model.json.ValidationPilaCoinJson;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
 import jakarta.annotation.PostConstruct;
 
@@ -47,15 +45,18 @@ public class ValidationPilacoinService {
     private CryptoUtil cryptoUtil;
     private PilacoinService pilacoinService;
 
+    private final SimpMessagingTemplate template;
+
     public ValidationPilacoinService(RabbitTemplate rabbitTemplate, DifficultService difficultService,
-            CryptoUtil cryptoUtil, PilacoinService pilacoinService) {
+            CryptoUtil cryptoUtil, PilacoinService pilacoinService, SimpMessagingTemplate template) {
         this.rabbitTemplate = rabbitTemplate;
         this.difficultService = difficultService;
         this.cryptoUtil = cryptoUtil;
         this.pilacoinService = pilacoinService;
+        this.template = template;
     }
 
-    // @RabbitListener(queues = { "${queue.pilacoin.mined}" })
+    @RabbitListener(queues = { "${queue.pilacoin.mined}" })
     public void verifyMinedPila(@Payload String strJson) {
         try {
             ObjectMapper om = new ObjectMapper();
@@ -73,6 +74,15 @@ public class ValidationPilacoinService {
             }
 
             System.out.println("\n\n[VERIFYING PILACOIN]: " + pilaCoin.getNomeCriador());
+
+            TypeActionWsJson typeActionWsJson = TypeActionWsJson.builder()
+                    .message("VERIFYING PILACOIN - criador: " + pilaCoin.getNomeCriador())
+                    .type(TypeActionWsJson.TypeAction.VALIDATION_PILACOIN)
+                    .timestamp(System.currentTimeMillis())
+                    .build();
+
+            template.convertAndSend("/topic/pilacoin",
+                    om.writeValueAsString(typeActionWsJson));
 
             DifficultJson difficultJson = difficultService.difficultJson;
             BigInteger difficult = new BigInteger(difficultJson.getDificuldade(), 16).abs();
@@ -95,10 +105,23 @@ public class ValidationPilacoinService {
 
                 System.out.println("[VALID PILACOIN]: " + pilaCoin.getNonce());
 
+                String formattedNonce =  pilaCoin.getNonce().
+                        substring(0, Math.min(pilaCoin.getNonce().length(), 10)) + "...";
+
+                typeActionWsJson.setMessage("VALID PILA - nonce: " + formattedNonce);
+                typeActionWsJson.setTimestamp(System.currentTimeMillis());
+                template.convertAndSend("/topic/pilacoin",
+                        om.writeValueAsString(typeActionWsJson));
+
                 rabbitTemplate.convertAndSend(pilaValidedQueue,
                         om.writeValueAsString(vPilaCoin));
             } else {
                 System.out.println("[INVALID PILACOIN]: " + pilaCoin.getNonce());
+
+                typeActionWsJson.setMessage("INVALID PILA - criador: " + pilaCoin.getNomeCriador());
+                typeActionWsJson.setTimestamp(System.currentTimeMillis());
+                template.convertAndSend("/topic/pilacoin",
+                        om.writeValueAsString(typeActionWsJson));
             }
         } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException | NoSuchPaddingException | InterruptedException e) {
@@ -123,7 +146,7 @@ public class ValidationPilacoinService {
 
                         rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
 
-                        // Thread.sleep(10000);
+                        Thread.sleep(10000);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);

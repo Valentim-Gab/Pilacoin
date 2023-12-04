@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table'
 import FormBtn from '@/components/form-btn'
 import Link from 'next/link'
+import { Client } from '@stomp/stompjs' 
 
 export default async function Trade() {
   const coinService = new CoinService()
@@ -41,7 +42,7 @@ export default async function Trade() {
           'lg:flex-row lg:justify-between lg:border lg:rounded lg:p-4'
         )}
       >
-        <Miner coin={coin} />
+        <Miner />
       </section>
 
       <section

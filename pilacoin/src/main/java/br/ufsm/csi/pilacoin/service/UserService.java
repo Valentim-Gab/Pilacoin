@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import br.ufsm.csi.pilacoin.model.User;
 import br.ufsm.csi.pilacoin.model.json.QueryJson;
 
-@Service
+// @Service
 public class UserService {
   @Value("${queue.query}")
   private String query;

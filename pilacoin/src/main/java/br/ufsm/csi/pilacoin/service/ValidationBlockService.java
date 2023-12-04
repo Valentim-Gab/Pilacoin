@@ -12,10 +12,12 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import br.ufsm.csi.pilacoin.model.json.TypeActionWsJson;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,7 +28,7 @@ import br.ufsm.csi.pilacoin.model.json.DifficultJson;
 import br.ufsm.csi.pilacoin.model.json.ValidationBlockJson;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
 
-// @Service
+@Service
 public class ValidationBlockService {
   @Value("${queue.bloco.mined}")
   private String blockMinedQueue;
@@ -38,11 +40,14 @@ public class ValidationBlockService {
   private RabbitTemplate rabbitTemplate;
   private CryptoUtil cryptoUtil;
 
+  private SimpMessagingTemplate template;
+
   public ValidationBlockService(RabbitTemplate rabbitTemplate, DifficultService difficultService,
-      CryptoUtil cryptoUtil) {
+      CryptoUtil cryptoUtil, SimpMessagingTemplate template) {
     this.rabbitTemplate = rabbitTemplate;
     this.difficultService = difficultService;
     this.cryptoUtil = cryptoUtil;
+    this.template = template;
   }
 
   @RabbitListener(queues = { "${queue.bloco.mined}" })
@@ -65,6 +70,15 @@ public class ValidationBlockService {
 
       System.out.println("\n\n[VERIFYING BLOCK]: " + block.getNomeUsuarioMinerador());
 
+      TypeActionWsJson typeActionWsJson = TypeActionWsJson.builder()
+              .message("VERIFYING BLOCK - minerador: " + block.getNomeUsuarioMinerador())
+              .type(TypeActionWsJson.TypeAction.VALIDATION_BLOCK)
+              .timestamp(System.currentTimeMillis())
+              .build();
+
+      template.convertAndSend("/topic/pilacoin",
+              om.writeValueAsString(typeActionWsJson));
+
       DifficultJson difficultJson = difficultService.difficultJson;
       BigInteger difficult = new BigInteger(difficultJson.getDificuldade(), 16).abs();
       BigInteger hash = cryptoUtil.generatehash(strJson);
@@ -86,9 +100,19 @@ public class ValidationBlockService {
 
         System.out.println("\n\n[VALID BLOCK]: " + vBlock.getBloco().getNomeUsuarioMinerador());
 
+        typeActionWsJson.setMessage("VALID BLOCK - minerador: " + vBlock.getBloco().getNomeUsuarioMinerador());
+        typeActionWsJson.setTimestamp(System.currentTimeMillis());
+        template.convertAndSend("/topic/pilacoin",
+                om.writeValueAsString(typeActionWsJson));
+
         rabbitTemplate.convertAndSend(blockValidedQueue, om.writeValueAsString(vBlock));
       } else {
         System.out.println("\n\n[INVALID BLOCK]: " + block.getNonce());
+
+        typeActionWsJson.setMessage("INVALID BLOCK");
+        typeActionWsJson.setTimestamp(System.currentTimeMillis());
+        template.convertAndSend("/topic/pilacoin",
+                om.writeValueAsString(typeActionWsJson));
       }
     } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException
         | BadPaddingException | NoSuchPaddingException | InterruptedException e) {

@@ -17,7 +17,7 @@ import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
 import br.ufsm.csi.pilacoin.model.json.QueryJson;
 import br.ufsm.csi.pilacoin.model.json.ReportJson;
 
-@Service
+// @Service
 public class MessagesService {
   public List<User> userList = new ArrayList<>();
   private final Long typeQueryUser = 1l;
