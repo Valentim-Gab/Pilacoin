@@ -20,7 +20,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   public void registerStompEndpoints(StompEndpointRegistry registry) {
     registry.addEndpoint("/update").setAllowedOrigins("http://localhost:3000");
     registry.addEndpoint("/update").setAllowedOrigins("http://localhost:3000").withSockJS();
-//    registry.addEndpoint("/pilacoin").setAllowedOrigins("http://localhost:3000");
-//    registry.addEndpoint("/pilacoin").setAllowedOrigins("http://localhost:3000").withSockJS();
   }
 }

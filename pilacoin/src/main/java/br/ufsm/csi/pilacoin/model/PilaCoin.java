@@ -45,35 +45,7 @@ public class PilaCoin {
     @Column(name = "status", nullable = false, length = 50)
     private StatusPila status;
 
-    public enum StatusPila { AG_VALIDACAO, AG_BLOCO, BLOCO_EM_VALIDACAO, VALIDO, INVALIDO }
-
-    // public static void main(String[] args) {
-    //     try {
-    //         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-    //         KeyPair pair = generator.generateKeyPair();
-    //         byte[] pubKey = pair.getPublic().getEncoded();
-
-    //         PilaCoin pilaCoin = PilaCoin.builder().chavePublica(pubKey)
-    //                 .dataHoraCriacao(new Date()).nomeMinerador("Valentim").build();
-    //         String value = "f".repeat(60);
-    //         BigInteger difficulty = new BigInteger(value, 16).abs();
-    //         BigInteger hash;
-    //         ObjectMapper objectMapper = new ObjectMapper();
-    //         MessageDigest md = MessageDigest.getInstance("SHA-256");
-    //         Random random = new Random();
-    //         byte[] bArrToRandom = new byte[256/8];
-
-    //         do {
-    //             random.nextBytes(bArrToRandom);
-    //             pilaCoin.nonce = new BigInteger(bArrToRandom).abs().toString();
-
-    //             String json = objectMapper.writeValueAsString(pilaCoin);
-    //             hash = new BigInteger(md.digest(json.getBytes(StandardCharsets.UTF_8)));
-    //             hash = hash.abs();
-    //         } while (hash.compareTo(difficulty) > 0);
-    //         System.out.println("Foi");
-    //     } catch (NoSuchAlgorithmException | JsonProcessingException e) {
-    //         throw new RuntimeException(e);
-    //     }
-    // }
+    public enum StatusPila {
+        AG_VALIDACAO, AG_BLOCO, BLOCO_EM_VALIDACAO, VALIDO, INVALIDO
+    }
 }

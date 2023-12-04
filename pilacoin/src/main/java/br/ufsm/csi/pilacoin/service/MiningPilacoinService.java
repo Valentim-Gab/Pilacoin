@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
 
-// @Service
+@Service
 public class MiningPilacoinService {
     private DifficultService difficultService;
     private CryptoUtil cryptoUtil;
@@ -77,8 +77,8 @@ public class MiningPilacoinService {
 
                         if (difficultJson.getValidadeFinal().compareTo(new Date()) > 0 || true) {
                             String pilaStr = mapper.writeValueAsString(pilaJson);
-                            String formattedNonce =  pilaJson.getNonce().
-                                    substring(0, Math.min(pilaJson.getNonce().length(), 10)) + "...";
+                            String formattedNonce = pilaJson.getNonce().substring(0,
+                                    Math.min(pilaJson.getNonce().length(), 10)) + "...";
 
                             typeActionWsJson.setMessage("MINED PILA - nonce: " + formattedNonce);
                             typeActionWsJson.setTimestamp(System.currentTimeMillis());
@@ -87,7 +87,7 @@ public class MiningPilacoinService {
 
                             System.out.println("\n\n[MINED PILA]: " + pilaStr);
 
-                            //rabbitTemplate.convertAndSend(pilaMineradoQueue, pilaStr);
+                            rabbitTemplate.convertAndSend(pilaMineradoQueue, pilaStr);
                         }
                     }
                 } catch (Exception e) {

@@ -1,7 +1,6 @@
 package br.ufsm.csi.pilacoin.service;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.crypto.Cipher;
 
@@ -13,12 +12,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.ufsm.csi.pilacoin.model.PilaCoin;
 import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
-import br.ufsm.csi.pilacoin.model.json.QueryJson;
 import br.ufsm.csi.pilacoin.model.json.TransactionJson;
 import br.ufsm.csi.pilacoin.repository.PilaCoinRepository;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;

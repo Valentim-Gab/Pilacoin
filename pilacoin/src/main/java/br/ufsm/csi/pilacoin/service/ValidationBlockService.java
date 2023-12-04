@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -71,13 +70,13 @@ public class ValidationBlockService {
       System.out.println("\n\n[VERIFYING BLOCK]: " + block.getNomeUsuarioMinerador());
 
       TypeActionWsJson typeActionWsJson = TypeActionWsJson.builder()
-              .message("VERIFYING BLOCK - minerador: " + block.getNomeUsuarioMinerador())
-              .type(TypeActionWsJson.TypeAction.VALIDATION_BLOCK)
-              .timestamp(System.currentTimeMillis())
-              .build();
+          .message("VERIFYING BLOCK - minerador: " + block.getNomeUsuarioMinerador())
+          .type(TypeActionWsJson.TypeAction.VALIDATION_BLOCK)
+          .timestamp(System.currentTimeMillis())
+          .build();
 
       template.convertAndSend("/topic/pilacoin",
-              om.writeValueAsString(typeActionWsJson));
+          om.writeValueAsString(typeActionWsJson));
 
       DifficultJson difficultJson = difficultService.difficultJson;
       BigInteger difficult = new BigInteger(difficultJson.getDificuldade(), 16).abs();
@@ -102,7 +101,7 @@ public class ValidationBlockService {
         typeActionWsJson.setMessage("VALID BLOCK - minerador: " + vBlock.getBloco().getNomeUsuarioMinerador());
         typeActionWsJson.setTimestamp(System.currentTimeMillis());
         template.convertAndSend("/topic/pilacoin",
-                om.writeValueAsString(typeActionWsJson));
+            om.writeValueAsString(typeActionWsJson));
 
         rabbitTemplate.convertAndSend(blockValidedQueue, om.writeValueAsString(vBlock));
       } else {
@@ -111,7 +110,7 @@ public class ValidationBlockService {
         typeActionWsJson.setMessage("INVALID BLOCK");
         typeActionWsJson.setTimestamp(System.currentTimeMillis());
         template.convertAndSend("/topic/pilacoin",
-                om.writeValueAsString(typeActionWsJson));
+            om.writeValueAsString(typeActionWsJson));
       }
     } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException
         | BadPaddingException | NoSuchPaddingException | InterruptedException e) {

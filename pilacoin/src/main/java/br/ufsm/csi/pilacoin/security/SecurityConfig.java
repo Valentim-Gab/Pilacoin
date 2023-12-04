@@ -1,6 +1,5 @@
 package br.ufsm.csi.pilacoin.security;
 
-import java.net.http.WebSocket;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;

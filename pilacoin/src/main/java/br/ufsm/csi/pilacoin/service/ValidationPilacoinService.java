@@ -5,9 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Random;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -25,7 +22,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import br.ufsm.csi.pilacoin.model.PilaCoin;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
 import jakarta.annotation.PostConstruct;
 
@@ -43,16 +39,14 @@ public class ValidationPilacoinService {
     private DifficultService difficultService;
     private RabbitTemplate rabbitTemplate;
     private CryptoUtil cryptoUtil;
-    private PilacoinService pilacoinService;
 
     private final SimpMessagingTemplate template;
 
     public ValidationPilacoinService(RabbitTemplate rabbitTemplate, DifficultService difficultService,
-            CryptoUtil cryptoUtil, PilacoinService pilacoinService, SimpMessagingTemplate template) {
+            CryptoUtil cryptoUtil, SimpMessagingTemplate template) {
         this.rabbitTemplate = rabbitTemplate;
         this.difficultService = difficultService;
         this.cryptoUtil = cryptoUtil;
-        this.pilacoinService = pilacoinService;
         this.template = template;
     }
 
@@ -104,8 +98,8 @@ public class ValidationPilacoinService {
 
                 System.out.println("[VALID PILACOIN]: " + pilaCoin.getNonce());
 
-                String formattedNonce =  pilaCoin.getNonce().
-                        substring(0, Math.min(pilaCoin.getNonce().length(), 10)) + "...";
+                String formattedNonce = pilaCoin.getNonce().substring(0, Math.min(pilaCoin.getNonce().length(), 10))
+                        + "...";
 
                 typeActionWsJson.setMessage("VALID PILA - nonce: " + formattedNonce);
                 typeActionWsJson.setTimestamp(System.currentTimeMillis());

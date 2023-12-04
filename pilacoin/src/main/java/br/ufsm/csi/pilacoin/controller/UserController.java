@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.ufsm.csi.pilacoin.model.User;
 import br.ufsm.csi.pilacoin.service.UserService;
 
-// @RestController
+@RestController
 @RequestMapping("/user")
 public class UserController {
   private final UserService userService;
