@@ -24,6 +24,9 @@ public class UserService {
   @Value("${queue.query}")
   private String query;
 
+  @Value("${queue.user.query}")
+  private String userQuery;
+
   private RabbitTemplate rabbitTemplate;
 
   MessagesService messagesService;
@@ -34,13 +37,13 @@ public class UserService {
   }
 
   public List<User> findAll() {
-    findAllByQuery();
+    QueryJson queryJson = QueryJson.builder()
+        .idQuery(1l)
+        .nomeUsuario("Gabriel_Valentim")
+        .tipoQuery(QueryJson.TypeQuery.USUARIOS)
+        .build();
 
-    if (!this.messagesService.userList.isEmpty()) {
-      return this.messagesService.userList;
-    }
-
-    return findAll();
+    return findAllByQuery(queryJson).getUsuariosResult();
   }
 
   public ResponseEntity<Object> findOne(String name) {
@@ -62,17 +65,28 @@ public class UserService {
     }
   }
 
-  public void findAllByQuery() {
+  public QueryJson findAllByQuery(QueryJson queryJson) {
     try {
       ObjectMapper om = new ObjectMapper();
 
-      QueryJson queryJson = QueryJson.builder()
-          .idQuery(1l)
-          .nomeUsuario("Gabriel_Valentim")
-          .tipoQuery(QueryJson.TypeQuery.USUARIOS)
-          .build();
-
       rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
+
+      for (int tries = 0; tries < 10; tries++) {
+        String queryResponse = (String) this.rabbitTemplate.receiveAndConvert(userQuery);
+        QueryJson queryJsonResponse = om.readValue(queryResponse, QueryJson.class);
+
+        if (queryJsonResponse == null) {
+          Thread.sleep(1000);
+
+          continue;
+        }
+
+        if (queryJsonResponse.getTipoQuery() == QueryJson.TypeQuery.USUARIOS) {
+          return queryJsonResponse;
+        }
+      }
+
+      return null;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
