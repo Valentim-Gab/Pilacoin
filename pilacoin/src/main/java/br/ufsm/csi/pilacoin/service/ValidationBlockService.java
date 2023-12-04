@@ -87,10 +87,9 @@ public class ValidationBlockService {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, cryptoUtil.generateKeys().getPrivate());
 
+        String newBlockStr = om.writeValueAsString(block);
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] signature = cipher.doFinal(md.digest(strJson.getBytes(StandardCharsets.UTF_8)));
-
-        Base64.getEncoder().encodeToString(signature);
+        byte[] signature = cipher.doFinal(md.digest(newBlockStr.getBytes(StandardCharsets.UTF_8)));
 
         ValidationBlockJson vBlock = ValidationBlockJson.builder()
             .bloco(block)
