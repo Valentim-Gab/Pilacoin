@@ -11,6 +11,7 @@ Using {
       pnpm
       Sass
       shadcn/ui
+      stompjs
     }
   
   Api:
@@ -20,6 +21,16 @@ Using {
       Security
       Lombok
       RabbitMQ
+      WebSocket
+      Thread
+      Files I/O
+      RSA Key Pair
+    }
+
+  Infra:
+    - Docker
+    - Oracle Cloud {
+      VM Ubuntu
     }
 }
 ```
