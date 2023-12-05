@@ -19,7 +19,7 @@ import java.util.Random;
 
 @Service
 public class MiningPilacoinService {
-    private DifficultService difficultService;
+    private final DifficultService difficultService;
     private final RabbitTemplate rabbitTemplate;
     private final WebSocketService webSocketService;
 

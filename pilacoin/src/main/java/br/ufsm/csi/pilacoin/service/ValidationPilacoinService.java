@@ -31,8 +31,8 @@ public class ValidationPilacoinService {
 
     public ValidationPilacoinService(RabbitTemplate rabbitTemplate, DifficultService difficultService,
             WebSocketService webSocketService) {
-        this.rabbitTemplate = rabbitTemplate;
         this.difficultService = difficultService;
+        this.rabbitTemplate = rabbitTemplate;
         this.webSocketService = webSocketService;
     }
 

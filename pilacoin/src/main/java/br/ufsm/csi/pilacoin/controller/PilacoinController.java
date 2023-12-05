@@ -37,7 +37,7 @@ public class PilacoinController {
     }
 
     @PostMapping("transfer")
-    public void transferOne(@RequestBody TransactionJson transactionJson) {
-        transferService.transfer(transactionJson);
+    public ResponseEntity<Object> transferOne(@RequestBody TransactionJson transactionJson) {
+        return transferService.transfer(transactionJson);
     }
 }

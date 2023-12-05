@@ -42,7 +42,6 @@ public class PilacoinService {
     public PilacoinService(PilaCoinRepository pRepository, RabbitTemplate rabbitTemplate,
             WebSocketService webSocketService) {
         this.pRepository = pRepository;
-
         this.rabbitTemplate = rabbitTemplate;
         this.webSocketService = webSocketService;
     }

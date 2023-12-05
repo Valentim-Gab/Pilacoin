@@ -21,10 +21,10 @@ public class DifficultService {
 
     @RabbitListener(queues = { "${queue.difficult}" })
     public void receiveDifficult(@Payload String receivedDifficultJson) {
-        ObjectMapper om = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper();
 
         try {
-            difficultJson = om.readValue(receivedDifficultJson, DifficultJson.class);
+            difficultJson = mapper.readValue(receivedDifficultJson, DifficultJson.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

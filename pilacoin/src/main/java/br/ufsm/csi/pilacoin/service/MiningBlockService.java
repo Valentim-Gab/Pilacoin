@@ -22,7 +22,7 @@ import br.ufsm.csi.pilacoin.web.WebSocketService;
 
 @Service
 public class MiningBlockService {
-    private DifficultService difficultService;
+    private final DifficultService difficultService;
     private final RabbitTemplate rabbitTemplate;
     private final WebSocketService webSocketService;
 
@@ -52,8 +52,8 @@ public class MiningBlockService {
                         BlockJson block = mapper.readValue(strJson, BlockJson.class);
 
                         System.out.println("\n\n[MINING BLOCK] - número: " + block.getNumeroBloco());
-                        webSocketService.send("MINING BLOCK - número: " + block.getNumeroBloco(), "/topic/pilacoin",
-                                TypeActionWsJson.TypeAction.MINER_BLOCK);
+                        webSocketService.send("MINING BLOCK - número: " + block.getNumeroBloco(),
+                                "/topic/pilacoin", TypeActionWsJson.TypeAction.MINER_BLOCK);
 
                         BlockJson minedBlock = BlockJson.builder()
                                 .numeroBloco(block.getNumeroBloco())
@@ -76,10 +76,9 @@ public class MiningBlockService {
                             String blockStr = mapper.writeValueAsString(minedBlock);
 
                             System.out.println("\n\n[BLOCO MINERADO]: " + blockStr);
-                            webSocketService.send(
-                                    "BLOCO MINERADO" + StrUtil.limitCharsAddEllipsis(minedBlock.getNonce(), 10),
-                                    "/topic/pilacoin",
-                                    TypeActionWsJson.TypeAction.MINER_BLOCK);
+                            webSocketService.send("BLOCO MINERADO - nonce: " + StrUtil.
+                                            limitCharsAddEllipsis(minedBlock.getNonce(), 10),
+                                    "/topic/pilacoin", TypeActionWsJson.TypeAction.MINER_BLOCK);
 
                             rabbitTemplate.convertAndSend(blockMinedQueue, blockStr);
                             Thread.sleep(10000);
