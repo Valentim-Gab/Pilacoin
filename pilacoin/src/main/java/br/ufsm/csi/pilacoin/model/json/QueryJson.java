@@ -19,19 +19,19 @@ import lombok.NoArgsConstructor;
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class QueryJson {
-  private Long idQuery;
-  private String nomeUsuario;
-  private String usuario;
-  private TypeQuery tipoQuery;
-  private PilaCoin.StatusPila status;
-  private String usuarioMinerador;
-  private String nonce;
-  private Long idBloco;
-  private List<User> usuariosResult;
-  private List<PilaCoinJson> pilasResult;
-  private List<BlockJson> blocosResult;
+    private Long idQuery;
+    private String nomeUsuario;
+    private String usuario;
+    private TypeQuery tipoQuery;
+    private PilaCoin.StatusPila status;
+    private String usuarioMinerador;
+    private String nonce;
+    private Long idBloco;
+    private List<User> usuariosResult;
+    private List<PilaCoinJson> pilasResult;
+    private List<BlockJson> blocosResult;
 
-  public enum TypeQuery {
-    USUARIOS, PILA, BLOCO
-  }
+    public enum TypeQuery {
+        USUARIOS, PILA, BLOCO
+    }
 }

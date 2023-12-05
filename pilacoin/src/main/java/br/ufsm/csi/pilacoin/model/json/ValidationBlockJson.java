@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ValidationBlockJson {
-  private String nomeValidador;
+    private String nomeValidador;
     private byte[] chavePublicaValidador;
     private byte[] assinaturaBloco;
     private BlockJson bloco;

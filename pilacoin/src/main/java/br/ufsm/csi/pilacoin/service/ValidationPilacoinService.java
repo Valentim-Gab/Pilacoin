@@ -1,123 +1,84 @@
 package br.ufsm.csi.pilacoin.service;
 
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
+import br.ufsm.csi.pilacoin.constant.UserConstant;
 import br.ufsm.csi.pilacoin.model.json.*;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
+import br.ufsm.csi.pilacoin.utils.StrUtil;
+import br.ufsm.csi.pilacoin.web.WebSocketService;
 
 @Service
 public class ValidationPilacoinService {
+    private final DifficultService difficultService;
+    private final RabbitTemplate rabbitTemplate;
+    private final WebSocketService webSocketService;
+
     @Value("${queue.pilacoin.mined}")
     private String pilaMineradoQueue;
 
     @Value("${queue.pilacoin.valided}")
     private String pilaValidedQueue;
 
-    private DifficultService difficultService;
-    private RabbitTemplate rabbitTemplate;
-    private CryptoUtil cryptoUtil;
-
-    private final SimpMessagingTemplate template;
-
     public ValidationPilacoinService(RabbitTemplate rabbitTemplate, DifficultService difficultService,
-            CryptoUtil cryptoUtil, SimpMessagingTemplate template) {
+            WebSocketService webSocketService) {
         this.rabbitTemplate = rabbitTemplate;
         this.difficultService = difficultService;
-        this.cryptoUtil = cryptoUtil;
-        this.template = template;
+        this.webSocketService = webSocketService;
     }
 
     @RabbitListener(queues = { "${queue.pilacoin.mined}" })
     public void verifyMinedPila(@Payload String strJson) {
         try {
-            ObjectMapper om = new ObjectMapper();
-            PilaCoinJson pilaCoin = null;
-            pilaCoin = om.readValue(strJson, PilaCoinJson.class);
+            BigInteger difficult = difficultService.getDifficult();
+            ObjectMapper mapper = new ObjectMapper();
+            PilaCoinJson pilaCoin = mapper.readValue(strJson, PilaCoinJson.class);
 
-            if (pilaCoin.getNomeCriador().contains("Gabriel_Valentim")) {
+            if (pilaCoin.getNomeCriador() == null || pilaCoin.getNomeCriador().contains(UserConstant.USERNAME)) {
                 rabbitTemplate.convertAndSend(pilaMineradoQueue, strJson);
 
                 return;
             }
 
-            while (difficultService.difficultJson == null) {
-                Thread.sleep(1000);
-            }
-
             System.out.println("\n\n[VERIFYING PILACOIN]: " + pilaCoin.getNomeCriador());
+            webSocketService.send("VERIFYING PILA - criador: " + pilaCoin.getNomeCriador(), "/topic/pilacoin",
+                    TypeActionWsJson.TypeAction.VALIDATION_PILACOIN);
 
-            TypeActionWsJson typeActionWsJson = TypeActionWsJson.builder()
-                    .message("VERIFYING PILACOIN - criador: " + pilaCoin.getNomeCriador())
-                    .type(TypeActionWsJson.TypeAction.VALIDATION_PILACOIN)
-                    .timestamp(System.currentTimeMillis())
-                    .build();
-
-            template.convertAndSend("/topic/pilacoin",
-                    om.writeValueAsString(typeActionWsJson));
-
-            DifficultJson difficultJson = difficultService.difficultJson;
-            BigInteger difficult = new BigInteger(difficultJson.getDificuldade(), 16).abs();
-            BigInteger hash = cryptoUtil.generatehash(strJson);
+            BigInteger hash = CryptoUtil.generatehash(strJson);
 
             if (hash.compareTo(difficult) < 0) {
                 Thread.sleep(500);
 
-                Cipher cipher = Cipher.getInstance("RSA");
-                cipher.init(Cipher.ENCRYPT_MODE, cryptoUtil.generateKeys().getPrivate());
-
-                String newPilaStr = om.writeValueAsString(pilaCoin);
-                MessageDigest md = MessageDigest.getInstance("SHA-256");
-                byte[] signature = cipher.doFinal(md.digest(newPilaStr.getBytes(StandardCharsets.UTF_8)));
-
                 ValidationPilaCoinJson vPilaCoin = ValidationPilaCoinJson.builder()
                         .pilaCoinJson(pilaCoin)
-                        .assinaturaPilaCoin(signature)
-                        .chavePublicaValidador(cryptoUtil.generateKeys().getPublic().getEncoded())
+                        .assinaturaPilaCoin(CryptoUtil.generateSignature(pilaCoin))
+                        .chavePublicaValidador(CryptoUtil.generateKeys().getPublic().getEncoded())
                         .nomeValidador("Gabriel_Valentim").build();
 
                 System.out.println("[VALID PILACOIN]: " + pilaCoin.getNonce());
+                webSocketService.send("VALID PILA - nonce: " + StrUtil.limitCharsAddEllipsis(pilaCoin.getNonce(), 10),
+                        "/topic/pilacoin",
+                        TypeActionWsJson.TypeAction.VALIDATION_PILACOIN);
 
-                String formattedNonce = pilaCoin.getNonce().substring(0, Math.min(pilaCoin.getNonce().length(), 10))
-                        + "...";
-
-                typeActionWsJson.setMessage("VALID PILA - nonce: " + formattedNonce);
-                typeActionWsJson.setTimestamp(System.currentTimeMillis());
-                template.convertAndSend("/topic/pilacoin",
-                        om.writeValueAsString(typeActionWsJson));
-
-                rabbitTemplate.convertAndSend(pilaValidedQueue,
-                        om.writeValueAsString(vPilaCoin));
+                rabbitTemplate.convertAndSend(pilaValidedQueue, mapper.writeValueAsString(vPilaCoin));
             } else {
                 System.out.println("[INVALID PILACOIN]: " + pilaCoin.getNonce());
-
-                typeActionWsJson.setMessage("INVALID PILA - criador: " + pilaCoin.getNomeCriador());
-                typeActionWsJson.setTimestamp(System.currentTimeMillis());
-                template.convertAndSend("/topic/pilacoin",
-                        om.writeValueAsString(typeActionWsJson));
+                webSocketService.send("INVALID PILA - criador: " + pilaCoin.getNomeCriador(),
+                        "/topic/pilacoin",
+                        TypeActionWsJson.TypeAction.VALIDATION_PILACOIN);
             }
 
             Thread.sleep(1000);
-        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException
-                | BadPaddingException | NoSuchPaddingException | InterruptedException e) {
+        } catch (JsonProcessingException | InterruptedException e) {
             e.printStackTrace();
         }
     }

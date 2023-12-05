@@ -16,13 +16,13 @@ import java.util.Date;
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionJson {
-  private byte[] chaveUsuarioOrigem;
-  private byte[] chaveUsuarioDestino;
-  private String nomeUsuarioOrigem;
-  private String nomeUsuarioDestino;
-  private byte[] assinatura;
-  private String noncePila;
-  private Date dataTransacao;
-  private Long id;
-  private String status;
+    private byte[] chaveUsuarioOrigem;
+    private byte[] chaveUsuarioDestino;
+    private String nomeUsuarioOrigem;
+    private String nomeUsuarioDestino;
+    private byte[] assinatura;
+    private String noncePila;
+    private Date dataTransacao;
+    private Long id;
+    private String status;
 }
