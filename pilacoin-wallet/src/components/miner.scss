@@ -1,0 +1,78 @@
+@import "@/assets/styles/media-queries.scss";
+
+.miner-messages {
+  min-height: 96px;
+  max-height: 192px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &::-webkit-scrollbar {
+    background-color: transparent;
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #fff;
+    border-radius: 6px;
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-track:hover {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+  }
+
+  @media (min-width: $sm) {
+    &::-webkit-scrollbar {
+      background-color: transparent;
+      width: 1rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      width: 1rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #fff;
+      border-radius: 6px;
+      width: 1rem;
+    }
+  }
+
+  @media (min-width: $sm) {
+    &::-webkit-scrollbar {
+      background-color: transparent;
+      width: 1rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      width: 1rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #fff;
+      border-radius: 6px;
+      width: 1rem;
+    }
+  }
+
+  @media (min-width: $lg) {
+    min-height: 200px;
+    max-height: 400px;
+    line-height: 2rem;
+  }
+}

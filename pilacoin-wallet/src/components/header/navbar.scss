@@ -1,0 +1,39 @@
+@import "@/assets/styles/media-queries.scss";
+
+.navbar {
+  transform: scaleY(0);
+  transform-origin: top;
+  position: fixed;
+  transition: 0.4s;
+  opacity: 0;
+  top: 48px;
+
+  @media (min-width: $sm) {
+    transform: scaleY(1);
+    opacity: 1;
+    top: 0;
+    position: relative;
+  }
+
+  &.active {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+
+  .items {
+    li {
+      .item {
+        transition: 0.4s;
+      }
+
+      &:hover > .item {
+        transform: translateX(1rem);
+
+        @media (min-width: $sm) {
+          transform: translateX(0);
+          scale: 1.2;
+        }
+      }
+    }
+  }
+}

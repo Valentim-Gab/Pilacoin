@@ -1,0 +1,16 @@
+@import "@/assets/styles/media-queries.scss";
+
+.trade {
+  .section-trade {
+    @media (min-width: $xl2) {
+      max-width: 1200px;
+    }
+  }
+
+  .nonce {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 1rem;
+    overflow: hidden;
+  }
+}

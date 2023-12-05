@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  pilacoin-wallet:
+    build: ./pilacoin-wallet
+    container_name: pilacoin-wallet
+    ports:
+      - '3044:3000'
+
+  pilacoin-api:
+    build: ./pilacoin
+    container_name: pilacoin-api
+    ports:
+      - '8081:8080'
+    depends_on:
+      - postgres
+    networks:
+      - pg_network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_pilacoin
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: pilacoin
+    ports:
+      - 5433:5432
+    networks:
+      - pg_network
+
+networks:
+  pg_network:
+    driver: bridge
