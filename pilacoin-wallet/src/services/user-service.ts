@@ -6,9 +6,13 @@ export class UserService {
 
   public async findAll(): Promise<User[] | null> {
     try {
-      const response = await fetch(this.endpoint, {
+      let response = await fetch(this.endpoint, {
         cache: 'no-cache',
       })
+
+      if (response.status == 204) {
+        return await this.findAll()
+      }
 
       if (response.ok && response.status == 200) {  
         const data = await response.json()

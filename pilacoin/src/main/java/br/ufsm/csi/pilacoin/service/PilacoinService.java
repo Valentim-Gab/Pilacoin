@@ -12,10 +12,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.ufsm.csi.pilacoin.model.json.QueryJson;
+import jakarta.annotation.PostConstruct;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,17 +33,26 @@ import br.ufsm.csi.pilacoin.utils.CryptoUtil;
 
 @Service
 public class PilacoinService {
+  @Value("${queue.query}")
+  private String query;
+
+  @Value("${queue.user.query}")
+  private String userQuery;
   private final PilaCoinRepository pRepository;
   private final CryptoUtil cryptoUtil;
   public RabbitTemplate rabbitTemplate;
 
+  private final SimpMessagingTemplate template;
+
   @Value("${queue.transfer}")
   private String transactionQueue;
 
-  public PilacoinService(PilaCoinRepository pRepository, CryptoUtil cryptoUtil, RabbitTemplate rabbitTemplate) {
+  public PilacoinService(PilaCoinRepository pRepository, CryptoUtil cryptoUtil, RabbitTemplate rabbitTemplate,
+                         SimpMessagingTemplate template) {
     this.pRepository = pRepository;
     this.cryptoUtil = cryptoUtil;
     this.rabbitTemplate = rabbitTemplate;
+    this.template = template;
   }
 
   public PilaCoin save(PilaCoinJson pilaCoinJson) {
@@ -68,6 +81,24 @@ public class PilacoinService {
 
   public Long findAllCount() {
     return pRepository.count();
+  }
+
+  @PostConstruct
+  public void emitAllCount() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          while (true) {
+            template.convertAndSend("/topic/data", findAllCount());
+
+            Thread.sleep(10000);
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    }).start();
   }
 
   public ResponseEntity<Object> findOneByNonce(String nonce) {
@@ -100,6 +131,52 @@ public class PilacoinService {
     } else {
       System.out.println("\n\n[ERROR]: PilaCoin não salvo no Banco");
     }
+  }
+
+  @PostConstruct
+  public void updateDatabase() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          while (true) {
+            QueryJson queryJson = QueryJson.builder()
+                    .idQuery(2l)
+                    .nomeUsuario("Gabriel_Valentim")
+                    .tipoQuery(QueryJson.TypeQuery.PILA)
+                    .build();
+
+            ObjectMapper om = new ObjectMapper();
+
+            rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
+
+            for (int tries = 0; tries <= 10; tries++) {
+              String queryResponse = (String) rabbitTemplate.receiveAndConvert(userQuery);
+
+              if (queryResponse == null) {
+                Thread.sleep(1000);
+
+                continue;
+              }
+
+              QueryJson queryJsonResponse = om.readValue(queryResponse, QueryJson.class);
+
+              if (queryJsonResponse.getIdQuery() == 2 && queryJsonResponse.getPilasResult() != null) {
+                for (PilaCoinJson pilacoin : queryJsonResponse.getPilasResult()) {
+                  if (pilacoin.getNomeCriador().equals("Gabriel_Valentim")) {
+                    save(pilacoin);
+                  }
+                }
+              }
+            }
+
+            Thread.sleep(10000);
+          }
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }).start();
   }
 
   public void deleteByNonce(String nonce) {

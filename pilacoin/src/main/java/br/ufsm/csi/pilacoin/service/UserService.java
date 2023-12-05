@@ -1,16 +1,12 @@
 package br.ufsm.csi.pilacoin.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import br.ufsm.csi.pilacoin.model.User;
 import br.ufsm.csi.pilacoin.model.json.QueryJson;
 
-// @Service
+@Service
 public class UserService {
   @Value("${queue.query}")
   private String query;
@@ -36,14 +32,20 @@ public class UserService {
     this.messagesService = messagesService;
   }
 
-  public List<User> findAll() {
+  public ResponseEntity<Object> findAll() {
     QueryJson queryJson = QueryJson.builder()
         .idQuery(1l)
-        .nomeUsuario("Gabriel_Valentim")
+        .nomeUsuario("gabriel_valentim")
         .tipoQuery(QueryJson.TypeQuery.USUARIOS)
         .build();
 
-    return findAllByQuery(queryJson).getUsuariosResult();
+    QueryJson queryJsonResponse = findAllByQuery(queryJson);
+
+    if (queryJsonResponse == null) {
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    return new ResponseEntity<>(queryJsonResponse.getUsuariosResult(), HttpStatus.OK);
   }
 
   public ResponseEntity<Object> findOne(String name) {
@@ -71,17 +73,18 @@ public class UserService {
 
       rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
 
-      for (int tries = 0; tries < 10; tries++) {
+      for (int tries = 0; tries <= 10; tries++) {
         String queryResponse = (String) this.rabbitTemplate.receiveAndConvert(userQuery);
-        QueryJson queryJsonResponse = om.readValue(queryResponse, QueryJson.class);
 
-        if (queryJsonResponse == null) {
+        if (queryResponse == null) {
           Thread.sleep(1000);
 
           continue;
         }
 
-        if (queryJsonResponse.getTipoQuery() == QueryJson.TypeQuery.USUARIOS) {
+        QueryJson queryJsonResponse = om.readValue(queryResponse, QueryJson.class);
+
+        if (queryJsonResponse.getIdQuery() == 1) {
           return queryJsonResponse;
         }
       }

@@ -15,7 +15,6 @@ public class WebSocketController {
     return message;
   }
 
-  @MessageMapping("/update")
   @SendTo("/topic/pilacoin")
   public String pilacoin(String message) {
     System.out.println("\n\n[RECEIVED MESSAGE]: " + message);

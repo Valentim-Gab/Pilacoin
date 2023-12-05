@@ -23,7 +23,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
-import jakarta.annotation.PostConstruct;
 
 @Service
 public class ValidationPilacoinService {
@@ -32,9 +31,6 @@ public class ValidationPilacoinService {
 
     @Value("${queue.pilacoin.valided}")
     private String pilaValidedQueue;
-
-    @Value("${queue.query}")
-    private String query;
 
     private DifficultService difficultService;
     private RabbitTemplate rabbitTemplate;
@@ -83,6 +79,8 @@ public class ValidationPilacoinService {
             BigInteger hash = cryptoUtil.generatehash(strJson);
 
             if (hash.compareTo(difficult) < 0) {
+                Thread.sleep(500);
+
                 Cipher cipher = Cipher.getInstance("RSA");
                 cipher.init(Cipher.ENCRYPT_MODE, cryptoUtil.generateKeys().getPrivate());
 
@@ -116,35 +114,11 @@ public class ValidationPilacoinService {
                 template.convertAndSend("/topic/pilacoin",
                         om.writeValueAsString(typeActionWsJson));
             }
+
+            Thread.sleep(1000);
         } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException | NoSuchPaddingException | InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    @PostConstruct
-    public void receiveValidedPila() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        QueryJson queryJson = QueryJson.builder()
-                                .idQuery(2l)
-                                .nomeUsuario("Gabriel_Valentim")
-                                .tipoQuery(QueryJson.TypeQuery.PILA)
-                                .build();
-
-                        ObjectMapper om = new ObjectMapper();
-
-                        rabbitTemplate.convertAndSend(query, om.writeValueAsString(queryJson));
-
-                        Thread.sleep(10000);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }).start();
     }
 }

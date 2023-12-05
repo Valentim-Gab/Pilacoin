@@ -83,6 +83,8 @@ public class ValidationBlockService {
       BigInteger hash = cryptoUtil.generatehash(strJson);
 
       if (hash.compareTo(difficult) < 0) {
+        Thread.sleep(500);
+
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, cryptoUtil.generateKeys().getPrivate());
 
@@ -112,6 +114,8 @@ public class ValidationBlockService {
         template.convertAndSend("/topic/pilacoin",
             om.writeValueAsString(typeActionWsJson));
       }
+
+      Thread.sleep(1000);
     } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException
         | BadPaddingException | NoSuchPaddingException | InterruptedException e) {
       e.printStackTrace();

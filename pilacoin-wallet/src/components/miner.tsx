@@ -63,6 +63,7 @@ export default function Miner() {
 
   socket.onConnect = (frame) => {
     let typeActionWsJson: TypeActionWsJson
+
     socket.subscribe('/topic/pilacoin', (message) => {
       typeActionWsJson = JSON.parse(message.body)
       const formattedTime = format(typeActionWsJson.timestamp ?? new Date(), 'HH:mm:ss');
