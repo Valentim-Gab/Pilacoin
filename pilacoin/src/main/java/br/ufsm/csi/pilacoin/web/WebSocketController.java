@@ -10,15 +10,11 @@ public class WebSocketController {
 
   @SendTo("/topic/data")
   public String update(String message) {
-    System.out.println("\n\n[RECEIVED MESSAGE]: " + message);
-
     return message;
   }
 
   @SendTo("/topic/pilacoin")
   public String pilacoin(String message) {
-    System.out.println("\n\n[RECEIVED MESSAGE]: " + message);
-
     return message;
   }
 }

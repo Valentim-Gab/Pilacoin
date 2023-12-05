@@ -17,10 +17,10 @@ import lombok.NoArgsConstructor;
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BlockJson {
-  private int numeroBloco;
-  private String nonceBlocoAnterior;
-  private String nonce;
-  private byte[] chaveUsuarioMinerador;
-  private String nomeUsuarioMinerador;
-  private List<TransactionJson> transacoes;
+    private int numeroBloco;
+    private String nonceBlocoAnterior;
+    private String nonce;
+    private byte[] chaveUsuarioMinerador;
+    private String nomeUsuarioMinerador;
+    private List<TransactionJson> transacoes;
 }

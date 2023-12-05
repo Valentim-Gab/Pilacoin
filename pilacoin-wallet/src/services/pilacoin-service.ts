@@ -38,7 +38,7 @@ export class PilacoinService {
     return null
   }
 
-  public async transferOne(transaction: Transaction): Promise<Boolean> {
+  public async transferOne(transaction: Transaction): Promise<Transaction | Boolean> {
     try {
       const response = await fetch(`${this.endpoint}/transfer`, {
         method: 'POST',
@@ -48,11 +48,15 @@ export class PilacoinService {
         }
       })
 
-      console.log(response.status)
-
       if (response.ok && response.status == 200) {  
-        return true
+        const transaction = await response.json()
+
+        return transaction
       }
+
+      const isError = await response.json()
+
+      return isError
     } catch (err) {
       console.error(err)
     }

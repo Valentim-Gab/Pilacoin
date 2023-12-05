@@ -9,92 +9,85 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import br.ufsm.csi.pilacoin.constant.UserConstant;
 import br.ufsm.csi.pilacoin.model.json.BlockJson;
-import br.ufsm.csi.pilacoin.model.json.DifficultJson;
 import br.ufsm.csi.pilacoin.utils.CryptoUtil;
+import br.ufsm.csi.pilacoin.utils.StrUtil;
+import br.ufsm.csi.pilacoin.web.WebSocketService;
 
 @Service
 public class MiningBlockService {
-  private DifficultService difficultService;
-  private CryptoUtil cryptoUtil;
-  public RabbitTemplate rabbitTemplate;
+    private final DifficultService difficultService;
+    private final RabbitTemplate rabbitTemplate;
+    private final WebSocketService webSocketService;
 
-  private final SimpMessagingTemplate template;
+    @Value("${queue.bloco.mined}")
+    private String blockMinedQueue;
 
-  @Value("${queue.bloco.mined}")
-  private String blockMinedQueue;
+    public MiningBlockService(DifficultService difficultService, RabbitTemplate rabbitTemplate,
+            WebSocketService webSocketService) {
+        this.difficultService = difficultService;
+        this.rabbitTemplate = rabbitTemplate;
+        this.webSocketService = webSocketService;
+    }
 
-  public MiningBlockService(DifficultService difficultService, CryptoUtil cryptoUtil, RabbitTemplate rabbitTemplate,
-                            SimpMessagingTemplate template) {
-    this.difficultService = difficultService;
-    this.cryptoUtil = cryptoUtil;
-    this.rabbitTemplate = rabbitTemplate;
-    this.template = template;
-  }
+    @RabbitListener(queues = { "${queue.block.find}" })
+    public void mine(@Payload String strJson) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        if (strJson == null) {
+                            return;
+                        }
 
-  @RabbitListener(queues = { "${queue.block.find}" })
-  public void mine(@Payload String strJson) {
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          while (true) {
-            if (difficultService.difficultJson == null) {
-              Thread.sleep(1000);
+                        BigInteger dificuldade = difficultService.getDifficult();
+                        ObjectMapper mapper = new ObjectMapper();
+                        BlockJson block = mapper.readValue(strJson, BlockJson.class);
 
-              continue;
+                        System.out.println("\n\n[MINING BLOCK] - número: " + block.getNumeroBloco());
+                        webSocketService.send("MINING BLOCK - número: " + block.getNumeroBloco(),
+                                "/topic/pilacoin", TypeActionWsJson.TypeAction.MINER_BLOCK);
+
+                        BlockJson minedBlock = BlockJson.builder()
+                                .numeroBloco(block.getNumeroBloco())
+                                .nonceBlocoAnterior(block.getNonce())
+                                .chaveUsuarioMinerador(CryptoUtil.generateKeys().getPublic().getEncoded())
+                                .nomeUsuarioMinerador(UserConstant.USERNAME)
+                                .build();
+
+                        byte[] bNum = new byte[256 / 8];
+                        Random random = new Random(System.currentTimeMillis());
+
+                        do {
+                            random.nextBytes(bNum);
+                            minedBlock.setNonce(new BigInteger(bNum).abs().toString());
+                        } while (CryptoUtil.generatehash(minedBlock).compareTo(dificuldade) > 0);
+
+                        if (difficultService.getFinalValidity().compareTo(new Date()) > 0 || true) {
+                            Thread.sleep(500);
+
+                            String blockStr = mapper.writeValueAsString(minedBlock);
+
+                            System.out.println("\n\n[BLOCO MINERADO]: " + blockStr);
+                            webSocketService.send("BLOCO MINERADO - nonce: " + StrUtil.
+                                            limitCharsAddEllipsis(minedBlock.getNonce(), 10),
+                                    "/topic/pilacoin", TypeActionWsJson.TypeAction.MINER_BLOCK);
+
+                            rabbitTemplate.convertAndSend(blockMinedQueue, blockStr);
+                            Thread.sleep(10000);
+                        }
+                    }
+                } catch (InterruptedException | JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
-
-            ObjectMapper om = new ObjectMapper();
-            BlockJson block = om.readValue(strJson, BlockJson.class);
-            DifficultJson difficultJson = difficultService.difficultJson;
-            BigInteger dificuldade = new BigInteger(difficultJson.getDificuldade(), 16).abs();
-
-            BlockJson minedBlock = BlockJson.builder()
-                .numeroBloco(block.getNumeroBloco())
-                .nonceBlocoAnterior(block.getNonce())
-                .chaveUsuarioMinerador(cryptoUtil.generateKeys().getPublic().getEncoded())
-                .nomeUsuarioMinerador("Gabriel_Valentim")
-                .build();
-
-            byte[] bNum = new byte[256 / 8];
-            Random random = new Random(System.currentTimeMillis());
-
-            do {
-              random.nextBytes(bNum);
-              minedBlock.setNonce(new BigInteger(bNum).abs().toString());
-            } while (cryptoUtil.generatehash(minedBlock).compareTo(dificuldade) > 0);
-
-            if (difficultJson.getValidadeFinal().compareTo(new Date()) > 0 || true) {
-              ObjectMapper mapper = new ObjectMapper();
-              String blockStr = mapper.writeValueAsString(minedBlock);
-
-              System.out.println("\n\n[BLOCO MINERADO]: " + blockStr);
-
-              TypeActionWsJson typeActionWsJson = TypeActionWsJson.builder()
-                      .message("BLOCO MINERADO")
-                      .type(TypeActionWsJson.TypeAction.MINER_BLOCK)
-                      .timestamp(System.currentTimeMillis())
-                      .build();
-
-              template.convertAndSend("/topic/pilacoin",
-                      mapper.writeValueAsString(typeActionWsJson));
-
-              rabbitTemplate.convertAndSend(blockMinedQueue, blockStr);
-
-              Thread.sleep(10000);
-            }
-          }
-        } catch (InterruptedException | JsonProcessingException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }).start();
-  }
+        }).start();
+    }
 }

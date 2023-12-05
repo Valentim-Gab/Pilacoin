@@ -36,7 +36,7 @@ export default function Transfer({ userList, pilacoin, userLogged }: TransferPro
 
     pilacoinService.transferOne(transaction).then((res) => {
       if (res) {
-        alert('Transferência realizada com sucesso!')
+        alert(`Transferência realizada com sucesso para: ${(res as Transaction).nomeUsuarioDestino}`)
 
         router.push('/trade')
         router.refresh()

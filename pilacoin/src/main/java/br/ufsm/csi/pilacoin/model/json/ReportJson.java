@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReportJson {
-  private Long geradoEm;
-  private String nomeUsuario;
-  private boolean minerouPila;
-  private boolean validouPila;
-  private boolean minerouBloco;
-  private boolean validouBloco;
-  private boolean transferiuPila;
+    private Long geradoEm;
+    private String nomeUsuario;
+    private boolean minerouPila;
+    private boolean validouPila;
+    private boolean minerouBloco;
+    private boolean validouBloco;
+    private boolean transferiuPila;
 }
